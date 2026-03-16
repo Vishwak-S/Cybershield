@@ -1,0 +1,313 @@
+{
+  "report_meta": {
+    "tool": "Passive Metadata-Graph Protocol (PMGP)",
+    "version": "2.0",
+    "generated_at": "2026-03-16 12:03:16 UTC"
+  },
+  "os_profile": {
+    "os_type": "Debian/Ubuntu",
+    "confidence": 0.75,
+    "indicators": [
+      "dpkg status database found; no Kali markers detected"
+    ],
+    "pkg_db_type": "dpkg",
+    "pkg_db_path": "C:\\Users\\navne\\AppData\\Local\\Temp\\pmgp_remote_v7xgzrq9\\vfs/var/lib/dpkg/status",
+    "tails_disk_confirmed": false,
+    "filesystem_artefacts": [
+      {
+        "path": "etc/crontab",
+        "type": "cron",
+        "description": "Cron job file with 5 active entry(s) – potential persistence",
+        "risk_level": "MEDIUM",
+        "snippet": "SHELL=/bin/sh"
+      },
+      {
+        "path": "etc/hosts",
+        "type": "hosts_mod",
+        "description": "/etc/hosts has 4 custom entry(s) – possible C2 infrastructure mapping or domain hijacking",
+        "risk_level": "MEDIUM",
+        "snippet": "fe00::0 ip6-localnet"
+      }
+    ]
+  },
+  "risk_assessment": {
+    "overall_risk": "HIGH",
+    "risk_score": 51,
+    "summary": [
+      "Overall Risk: HIGH (score 51/100)",
+      "OS: Debian/Ubuntu (confidence 75%)",
+      "Packages scanned: 831",
+      "Suspicious tools detected: 4 (0 high-risk, 2 dual-use, 2 anonymization)",
+      "Configuration traces found: 1",
+      "Filesystem artefacts: 2 (shell history, SSH keys, cron jobs, hosts modifications)",
+      "Live processes scanned: 34 (1 with suspicious indicators)"
+    ],
+    "kill_chains": []
+  },
+  "detected_tools": [
+    {
+      "name": "tcpdump",
+      "risk_level": "dual_use",
+      "matched_package": "tcpdump",
+      "description": "Packet analyzer",
+      "mitre_technique": "T1040 - Network Sniffing",
+      "category": "Collection",
+      "detection_method": "package_db"
+    },
+    {
+      "name": "netcat",
+      "risk_level": "dual_use",
+      "matched_package": "netcat-openbsd",
+      "description": "TCP/UDP networking utility",
+      "mitre_technique": "T1059 - Command and Scripting Interpreter",
+      "category": "Execution",
+      "detection_method": "package_db"
+    },
+    {
+      "name": "tor",
+      "risk_level": "anonymization",
+      "matched_package": "tor",
+      "description": "Onion routing anonymizer",
+      "mitre_technique": "T1090.003 - Multi-hop Proxy",
+      "category": "Command and Control",
+      "detection_method": "package_db"
+    },
+    {
+      "name": "torsocks",
+      "risk_level": "anonymization",
+      "matched_package": "torsocks",
+      "description": "Route application traffic through Tor",
+      "mitre_technique": "T1090.003 - Multi-hop Proxy",
+      "category": "Command and Control",
+      "detection_method": "package_db"
+    }
+  ],
+  "mitre_coverage": [
+    {
+      "technique_id": "T1059",
+      "technique_name": "Command and Scripting Interpreter",
+      "tactic": "Execution",
+      "tools": [
+        "netcat"
+      ]
+    },
+    {
+      "technique_id": "T1040",
+      "technique_name": "Network Sniffing",
+      "tactic": "Collection",
+      "tools": [
+        "tcpdump"
+      ]
+    },
+    {
+      "technique_id": "T1090.003",
+      "technique_name": "Multi-hop Proxy",
+      "tactic": "Command and Control",
+      "tools": [
+        "tor",
+        "torsocks",
+        "tor"
+      ]
+    }
+  ],
+  "risk_items": [
+    {
+      "source": "os",
+      "risk_level": "LOW",
+      "title": "OS Identified: Debian/Ubuntu",
+      "description": "Standard Debian/Ubuntu system (confidence: 75%)",
+      "mitre_technique": "",
+      "mitre_category": "",
+      "evidence": "dpkg status database found; no Kali markers detected"
+    },
+    {
+      "source": "tool",
+      "risk_level": "MEDIUM",
+      "title": "tcpdump (tcpdump)",
+      "description": "Packet analyzer",
+      "mitre_technique": "T1040",
+      "mitre_category": "Collection",
+      "evidence": "Package: tcpdump"
+    },
+    {
+      "source": "tool",
+      "risk_level": "MEDIUM",
+      "title": "netcat (netcat-openbsd)",
+      "description": "TCP/UDP networking utility",
+      "mitre_technique": "T1059",
+      "mitre_category": "Execution",
+      "evidence": "Package: netcat-openbsd"
+    },
+    {
+      "source": "tool",
+      "risk_level": "HIGH",
+      "title": "tor (tor)",
+      "description": "Onion routing anonymizer",
+      "mitre_technique": "T1090.003",
+      "mitre_category": "Command and Control",
+      "evidence": "Package: tor"
+    },
+    {
+      "source": "tool",
+      "risk_level": "HIGH",
+      "title": "torsocks (torsocks)",
+      "description": "Route application traffic through Tor",
+      "mitre_technique": "T1090.003",
+      "mitre_category": "Command and Control",
+      "evidence": "Package: torsocks"
+    },
+    {
+      "source": "artefact",
+      "risk_level": "MEDIUM",
+      "title": "Filesystem artefact: etc/crontab",
+      "description": "Cron job file with 5 active entry(s) – potential persistence",
+      "mitre_technique": "T1053.003",
+      "mitre_category": "Persistence",
+      "evidence": "Path: etc/crontab | Snippet: SHELL=/bin/sh"
+    },
+    {
+      "source": "artefact",
+      "risk_level": "MEDIUM",
+      "title": "Filesystem artefact: etc/hosts",
+      "description": "/etc/hosts has 4 custom entry(s) – possible C2 infrastructure mapping or domain hijacking",
+      "mitre_technique": "T1583.001",
+      "mitre_category": "Resource Development",
+      "evidence": "Path: etc/hosts | Snippet: fe00::0 ip6-localnet"
+    },
+    {
+      "source": "process",
+      "risk_level": "HIGH",
+      "title": "Offensive tool running: PID 274 (tor)",
+      "description": "Tor anonymizer running — /usr/bin/tor --defaults-torrc /usr/share/tor/tor-service-defaults-torrc -f /etc/tor/torrc --RunAsDae",
+      "mitre_technique": "T1090.003",
+      "mitre_category": "Command and Control",
+      "evidence": "/proc/274/cmdline"
+    }
+  ],
+  "live_analysis": {
+    "is_live_system": true,
+    "total_processes_scanned": 34,
+    "suspicious_connections": 0,
+    "findings": [
+      {
+        "pid": 274,
+        "comm": "tor",
+        "cmdline": "/usr/bin/tor --defaults-torrc /usr/share/tor/tor-service-defaults-torrc -f /etc/tor/torrc --RunAsDaemon 0",
+        "suspicious_vars": {},
+        "attacker_ips": {},
+        "suspicious_paths": [],
+        "suspicious_maps": [],
+        "cmdline_matches": [
+          {
+            "note": "Tor anonymizer running",
+            "technique": "T1090.003",
+            "category": "Command and Control"
+          }
+        ],
+        "notes": [
+          "[T1090.003] Tor anonymizer running — cmdline: /usr/bin/tor --defaults-torrc /usr/share/tor/tor-service-defaults-torrc -f /etc/tor/torrc --RunAsDaemon 0"
+        ]
+      }
+    ],
+    "network_connections": [
+      {
+        "protocol": "tcp",
+        "local": "127.0.0.1:33060",
+        "remote": "0.0.0.0:0",
+        "state": "LISTEN",
+        "suspicious": false
+      },
+      {
+        "protocol": "tcp",
+        "local": "10.255.255.254:53",
+        "remote": "0.0.0.0:0",
+        "state": "LISTEN",
+        "suspicious": false
+      },
+      {
+        "protocol": "tcp",
+        "local": "127.0.0.1:9050",
+        "remote": "0.0.0.0:0",
+        "state": "LISTEN",
+        "suspicious": false
+      },
+      {
+        "protocol": "tcp",
+        "local": "0.0.0.0:8501",
+        "remote": "0.0.0.0:0",
+        "state": "LISTEN",
+        "suspicious": false
+      },
+      {
+        "protocol": "tcp",
+        "local": "127.0.0.54:53",
+        "remote": "0.0.0.0:0",
+        "state": "LISTEN",
+        "suspicious": false
+      },
+      {
+        "protocol": "tcp",
+        "local": "127.0.0.1:3306",
+        "remote": "0.0.0.0:0",
+        "state": "LISTEN",
+        "suspicious": false
+      },
+      {
+        "protocol": "tcp",
+        "local": "127.0.0.1:36785",
+        "remote": "0.0.0.0:0",
+        "state": "LISTEN",
+        "suspicious": false
+      },
+      {
+        "protocol": "tcp",
+        "local": "127.0.0.53:53",
+        "remote": "0.0.0.0:0",
+        "state": "LISTEN",
+        "suspicious": false
+      },
+      {
+        "protocol": "tcp6",
+        "local": ":::8501",
+        "remote": ":::0",
+        "state": "LISTEN",
+        "suspicious": false
+      },
+      {
+        "protocol": "udp",
+        "local": "127.0.0.54:53",
+        "remote": "0.0.0.0:0",
+        "state": "CLOSE",
+        "suspicious": false
+      },
+      {
+        "protocol": "udp",
+        "local": "127.0.0.53:53",
+        "remote": "0.0.0.0:0",
+        "state": "CLOSE",
+        "suspicious": false
+      },
+      {
+        "protocol": "udp",
+        "local": "10.255.255.254:53",
+        "remote": "0.0.0.0:0",
+        "state": "CLOSE",
+        "suspicious": false
+      },
+      {
+        "protocol": "udp",
+        "local": "127.0.0.1:323",
+        "remote": "0.0.0.0:0",
+        "state": "CLOSE",
+        "suspicious": false
+      },
+      {
+        "protocol": "udp6",
+        "local": "::1:323",
+        "remote": ":::0",
+        "state": "CLOSE",
+        "suspicious": false
+      }
+    ]
+  }
+}

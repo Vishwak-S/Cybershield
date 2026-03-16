@@ -29,6 +29,8 @@ class DetectedTool:
     mitre_technique: str
     category: str
     detection_method: str = "package_db"  # "package_db" | "filesystem" | "config"
+    mtime: Optional[float] = None
+    atime: Optional[float] = None
 
 
 @dataclass
@@ -94,6 +96,16 @@ def detect_tools(
         for tool_name, meta in tools.items():
             for pkg_variant in meta.get("packages", []):
                 if pkg_variant.lower() in installed:
+                    latest_atime = None
+                    for rel_path in meta.get("binary_paths", []):
+                        full_path = os.path.join(root_path, rel_path.lstrip("/"))
+                        if os.path.exists(full_path):
+                            try:
+                                at = os.path.getatime(full_path)
+                                if latest_atime is None or at > latest_atime:
+                                    latest_atime = at
+                            except OSError: pass
+
                     result.detected_tools.append(DetectedTool(
                         name=tool_name,
                         risk_level=risk_level,
@@ -102,6 +114,8 @@ def detect_tools(
                         mitre_technique=meta.get("mitre_technique", ""),
                         category=meta.get("category", ""),
                         detection_method="package_db",
+                        mtime=installed[pkg_variant.lower()],
+                        atime=latest_atime,
                     ))
                     already_found.add(tool_name)
                     break
@@ -116,6 +130,13 @@ def detect_tools(
                 full_path = os.path.join(root_path, rel_path.lstrip("/"))
                 if os.path.exists(full_path):
                     result.filesystem_hits.append(full_path)
+                    
+                    mtime = None; atime = None
+                    try: mtime = os.path.getmtime(full_path)
+                    except OSError: pass
+                    try: atime = os.path.getatime(full_path)
+                    except OSError: pass
+                    
                     result.detected_tools.append(DetectedTool(
                         name=tool_name,
                         risk_level=risk_level,
@@ -124,6 +145,8 @@ def detect_tools(
                         mitre_technique=meta.get("mitre_technique", ""),
                         category=meta.get("category", ""),
                         detection_method="filesystem",
+                        mtime=mtime,
+                        atime=atime,
                     ))
                     already_found.add(tool_name)
                     break
@@ -137,6 +160,12 @@ def detect_tools(
                 if os.path.exists(full_path):
                     result.config_hits.append(full_path)
                     if tool_name not in already_found:
+                        mtime = None; atime = None
+                        try: mtime = os.path.getmtime(full_path)
+                        except OSError: pass
+                        try: atime = os.path.getatime(full_path)
+                        except OSError: pass
+                        
                         result.detected_tools.append(DetectedTool(
                             name=tool_name,
                             risk_level=risk_level,
@@ -145,6 +174,8 @@ def detect_tools(
                             mitre_technique=meta.get("mitre_technique", ""),
                             category=meta.get("category", ""),
                             detection_method="config",
+                            mtime=mtime,
+                            atime=atime,
                         ))
                         already_found.add(tool_name)
                     break  # one config hit is enough per tool
@@ -154,8 +185,12 @@ def detect_tools(
 
 # ── Package list readers ──────────────────────────────────────────────────────
 
-def _read_dpkg_packages(root: str, explicit_path: Optional[str]) -> set[str]:
+def _read_dpkg_packages(root: str, explicit_path: Optional[str]) -> dict[str, float]:
     status_path = explicit_path or f"{root}/var/lib/dpkg/status"
+    # DPKG doesn't inherently store install dates in `status` easily natively.
+    # However, `/var/lib/dpkg/info/[pkg].list` metadata creation time is the exact install time.
+    info_dir = f"{root}/var/lib/dpkg/info"
+    
     content = _safe_read(status_path, max_bytes=10_000_000)
     if not content and os.path.isdir(status_path):
         content = ""
@@ -164,24 +199,38 @@ def _read_dpkg_packages(root: str, explicit_path: Optional[str]) -> set[str]:
                 content += _safe_read(os.path.join(status_path, fname))
         except OSError:
             pass
-    return _parse_dpkg_names(content)
+            
+    names = _parse_dpkg_names(content)
+    result: dict[str, float] = {}
+    for pkg in names:
+        result[pkg] = 0.0
+        list_file = os.path.join(info_dir, f"{pkg}.list")
+        if os.path.exists(list_file):
+            try:
+                result[pkg] = os.path.getmtime(list_file)
+            except OSError:
+                pass
+    return result
 
 
-def _read_pacman_packages(root: str, explicit_path: Optional[str]) -> set[str]:
+def _read_pacman_packages(root: str, explicit_path: Optional[str]) -> dict[str, float]:
     db_dir = explicit_path or f"{root}/var/lib/pacman/local"
-    names: set[str] = set()
+    result: dict[str, float] = {}
     if not os.path.isdir(db_dir):
-        return names
+        return result
     try:
         for entry in os.listdir(db_dir):
             desc_path = os.path.join(db_dir, entry, "desc")
             content = _safe_read(desc_path, max_bytes=2048)
             pkg_name = _parse_pacman_name(content)
             if pkg_name:
-                names.add(pkg_name)
+                mtime = 0.0
+                try: mtime = os.path.getmtime(desc_path)
+                except OSError: pass
+                result[pkg_name] = mtime
     except OSError:
         pass
-    return names
+    return result
 
 
 # ── Parsers ───────────────────────────────────────────────────────────────────

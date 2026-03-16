@@ -1,0 +1,51 @@
+{
+  "report_meta": {
+    "tool": "Passive Metadata-Graph Protocol (PMGP)",
+    "version": "2.0",
+    "generated_at": "2026-03-16 13:17:00 UTC"
+  },
+  "os_profile": {
+    "os_type": "Unknown Linux",
+    "confidence": 0.1,
+    "indicators": [
+      "no recognised package database found"
+    ],
+    "pkg_db_type": "unknown",
+    "pkg_db_path": null,
+    "tails_disk_confirmed": false,
+    "filesystem_artefacts": []
+  },
+  "risk_assessment": {
+    "overall_risk": "INFO",
+    "risk_score": 0,
+    "summary": [
+      "Overall Risk: INFO (score 0/100)",
+      "OS: Unknown Linux (confidence 10%)",
+      "Packages scanned: 0",
+      "Suspicious tools detected: 0 (0 high-risk, 0 dual-use, 0 anonymization)"
+    ],
+    "kill_chains": [],
+    "time_of_attack": "No attack detected"
+  },
+  "detected_tools": [],
+  "mitre_coverage": [],
+  "risk_items": [
+    {
+      "source": "os",
+      "risk_level": "INFO",
+      "title": "OS Identified: Unknown Linux",
+      "description": "Operating system could not be determined (confidence: 10%)",
+      "mitre_technique": "",
+      "mitre_category": "",
+      "evidence": "no recognised package database found"
+    }
+  ],
+  "disk_analysis": {
+    "image_path": "\"C:\\Users\\VISHWAK S\\kali-linux-2025.2-installer-amd64.iso\"",
+    "has_gpt": false,
+    "has_mbr": false,
+    "tails_data_found": false,
+    "partitions": [],
+    "notes": []
+  }
+}

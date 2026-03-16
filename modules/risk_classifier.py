@@ -115,6 +115,7 @@ class RiskReport:
     mitre_coverage:  list[MitreEntry] = field(default_factory=list)
     summary_lines:   list[str]        = field(default_factory=list)
     kill_chains:     list[str]        = field(default_factory=list)
+    time_of_attack:  str              = "Not determined"
 
     @property
     def items_by_level(self) -> dict[str, list[RiskItem]]:
@@ -295,6 +296,37 @@ def classify_risk(
         score, overall, kill_chains_found,
     )
 
+    # ── Estimated Time of Attack ──────────────────────────────────────────
+    attack_time = "No attack detected"
+    if items:
+        import os
+        from datetime import datetime, timezone
+        
+        timestamps = []
+        if tool_result:
+            for t in tool_result.detected_tools:
+                if t.mtime:
+                    timestamps.append(t.mtime)
+            for p in tool_result.filesystem_hits + tool_result.config_hits:
+                if os.path.exists(p):
+                    try:
+                        timestamps.append(os.path.getmtime(p))
+                    except OSError:
+                        pass
+        
+        # Fallbacks to get some reference time
+        if not timestamps and os_profile and os_profile.pkg_db_path and os.path.exists(os_profile.pkg_db_path):
+            try:
+                timestamps.append(os.path.getmtime(os_profile.pkg_db_path))
+            except OSError:
+                pass
+                
+        if timestamps:
+            earliest_ts = min(timestamps) # Oldest tool/config modification time
+            attack_time = datetime.fromtimestamp(earliest_ts, timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC (Extracted)")
+        elif kill_chains_found or overall in ("CRITICAL", "HIGH"):
+            attack_time = "Requires deeper timeline analysis (MACB)"
+    
     return RiskReport(
         overall_risk=overall,
         risk_score=score,
@@ -306,6 +338,7 @@ def classify_risk(
         ),
         summary_lines=summary,
         kill_chains=kill_chains_found,
+        time_of_attack=attack_time,
     )
 
 

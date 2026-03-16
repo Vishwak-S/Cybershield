@@ -529,6 +529,10 @@ def _run_demo() -> PipelineResult:
     )
 
     risk_report = classify_risk(os_profile, tool_result, live_result, disk_result)
+    
+    # Overwrite time of attack for demo
+    risk_report.time_of_attack = "2024-11-05 14:32:05 UTC (Demo Extracted)"
+
     json_rep = generate_json_report(os_profile, tool_result, risk_report, live_result, disk_result)
     html_rep = generate_html_report(os_profile, tool_result, risk_report, live_result, disk_result)
 
@@ -556,7 +560,10 @@ with st.sidebar:
     )
     root_path = "/"
     if analysis_mode == "Custom Root Path":
-        root_path = st.text_input("Filesystem Root Path", placeholder="/mnt/evidence")
+        root_path = st.text_input("Filesystem Root Path", placeholder="/mnt/evidence").strip().strip("\"'")
+        import os
+        if root_path and os.path.isfile(root_path):
+            st.warning("⚠️ **Warning:** The Root Path must be a mounted directory, not a file (e.g., an `.iso` image). PMGP needs to read the extracted filesystem. (If you want to analyze a disk image for partitions, use 'Disk Image Analysis' below).")
     elif analysis_mode == "Live System (/)":
         root_path = "/"
         st.warning("Reads this machine's actual package database.")
@@ -570,11 +577,11 @@ with st.sidebar:
         run_disk  = st.checkbox("Disk Image Analysis", value=False)
         disk_path = ""
         if run_disk:
-            disk_path = st.text_input("Disk Image Path", placeholder="/path/to/image.img")
+            disk_path = st.text_input("Disk Image Path", placeholder="/path/to/image.img").strip().strip("\"'")
         save_reports = st.checkbox("Save Reports to Disk", value=False)
         output_dir   = "reports"
         if save_reports:
-            output_dir = st.text_input("Output Directory", value="reports")
+            output_dir = st.text_input("Output Directory", value="reports").strip().strip("\"'")
     else:
         run_live = False; run_disk = False; disk_path = ""
         save_reports = False; output_dir = "reports"
@@ -913,7 +920,18 @@ if st.session_state.remote_listening:
                         _ca.markdown(f"**`{_t.get('name','')}`**")
                         _cb.markdown(f"<small>{_t.get('description','')}</small>", unsafe_allow_html=True)
                         _mth = _t.get("detection_method","package_db")
-                        _cc.markdown(f"`{_t.get('mitre_technique','').split(' ')[0]}` {_mi.get(_mth,'')} <small>{_mth}</small>", unsafe_allow_html=True)
+                        _mtime = _t.get("mtime")
+                        _atime = _t.get("atime")
+                        import datetime
+                        _time_str = ""
+                        if _mtime:
+                            _time_str += f"<br>Installed: {datetime.datetime.fromtimestamp(_mtime, datetime.timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')}"
+                        if _atime:
+                            _time_str += f"<br>Last Used: {datetime.datetime.fromtimestamp(_atime, datetime.timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')}"
+                        else:
+                            _time_str += f"<br>Last Used: -"
+                        
+                        _cc.markdown(f"`{_t.get('mitre_technique','').split(' ')[0]}` {_mi.get(_mth,'')} <small>{_mth}</small><div style='font-size:0.7em;color:#888'>{_time_str}</div>", unsafe_allow_html=True)
 
         with _rtab_mitre:
             st.subheader("MITRE ATT&CK Coverage")
@@ -1063,12 +1081,13 @@ if result.errors:
         for e in result.errors: st.warning(e)
 
 # ── Metrics ───────────────────────────────────────────────────────────────────
-m1, m2, m3, m4, m5 = st.columns(5)
+m1, m2, m3, m4, m5, m6 = st.columns(6)
 m1.metric("OS Detected",      op.os_type.value.split(" ")[0])
 m2.metric("Confidence",       f"{op.confidence:.0%}")
 m3.metric("Tools Found",      len(tr.detected_tools))
 m4.metric("Packages Scanned", tr.total_packages_scanned)
 m5.metric("MITRE Techniques", len(rr.mitre_coverage))
+m6.metric("Earliest Suspicious Install", getattr(rr, 'time_of_attack', 'Not determined').split(' ')[0])
 
 if lr and lr.is_live_system:
     n1, n2, n3 = st.columns(3)
@@ -1115,7 +1134,7 @@ with tab_tools:
         if not tools: continue
         with st.expander(f"{emoji} {label} ({len(tools)})", expanded=(risk_key == "high_risk")):
             for t in tools:
-                ca, cb, cc, cd = st.columns([2, 3, 3, 1])
+                ca, cb, cc, cd = st.columns([2, 3, 3, 2])
                 ca.markdown(f"**`{t.name}`**")
                 cb.markdown(f"<small>{t.description}</small>", unsafe_allow_html=True)
                 cc.markdown(
@@ -1123,9 +1142,21 @@ with tab_tools:
                     f'<span class="mitre-tag">{t.category}</span>',
                     unsafe_allow_html=True,
                 )
+                
+                _time_str = ""
+                import datetime
+                if t.mtime:
+                    _time_str += f"<br><small style='color:#888'>Installed: {datetime.datetime.fromtimestamp(t.mtime, datetime.timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')}</small>"
+                
+                _atime_val = getattr(t, 'atime', None)
+                if _atime_val:
+                    _time_str += f"<br><small style='color:#888'>Last Used: {datetime.datetime.fromtimestamp(_atime_val, datetime.timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')}</small>"
+                else:
+                    _time_str += f"<br><small style='color:#888'>Last Used: -</small>"
+
                 cd.markdown(
                     f"{method_icons.get(t.detection_method, '')} "
-                    f"<small>{t.detection_method}</small>",
+                    f"<small>{t.detection_method}</small>{_time_str}",
                     unsafe_allow_html=True,
                 )
     if tr.filesystem_hits:

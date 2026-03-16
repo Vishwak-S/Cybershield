@@ -1,0 +1,48 @@
+{
+  "report_meta": {
+    "tool": "Passive Metadata-Graph Protocol (PMGP)",
+    "version": "2.0",
+    "generated_at": "2026-03-16 14:47:30 UTC"
+  },
+  "os_profile": {
+    "os_type": "Kali Linux",
+    "confidence": 0.8,
+    "pkg_db_type": "dpkg"
+  },
+  "risk_assessment": {
+    "overall_risk": "CRITICAL",
+    "risk_score": 67
+  },
+  "detected_tools": [
+    {
+      "name": "wireshark",
+      "risk": "dual_use",
+      "mtime": 1766050736.7924807,
+      "atime": 1766050733.0
+    },
+    {
+      "name": "tcpdump",
+      "risk": "dual_use",
+      "mtime": 1757945428.3000653,
+      "atime": 1766050510.0245159
+    },
+    {
+      "name": "netcat",
+      "risk": "dual_use",
+      "mtime": 1757945423.8719442,
+      "atime": null
+    },
+    {
+      "name": "tor",
+      "risk": "anonymization",
+      "mtime": 1766051372.3323874,
+      "atime": 1773639929.466431
+    },
+    {
+      "name": "torsocks",
+      "risk": "anonymization",
+      "mtime": 1766051372.5083876,
+      "atime": 1766051436.8163788
+    }
+  ]
+}

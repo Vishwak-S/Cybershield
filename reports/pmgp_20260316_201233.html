@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forensic Report - Kali Linux</title>
+    
+<style>
+    :root {
+        --primary: #0f172a;
+        --accent: #2563eb;
+        --text: #334155;
+        --muted: #94a3b8;
+        --border: #e2e8f0;
+        --bg: #f8fafc;
+        --card: #ffffff;
+    }
+    body { font-family: 'Inter', -apple-system, system-ui, sans-serif; color: var(--text); background: #fdfdfd; margin: 0; padding: 0; line-height: 1.6; }
+    .container { max-width: 900px; margin: 3rem auto; background: var(--card); padding: 4rem; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid var(--border); }
+    header { border-bottom: 2px solid var(--primary); padding-bottom: 2rem; margin-bottom: 4rem; text-align: center; }
+    h1 { color: var(--primary); font-size: 1.8rem; margin: 0; font-weight: 800; }
+    h2 { font-size: 1.25rem; border-left: 5px solid var(--primary); padding-left: 1.2rem; margin-top: 4rem; color: var(--primary); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; }
+    h3 { font-size: 1.1rem; margin-top: 1.8rem; color: #1e293b; font-weight: 600; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+    p { margin-top: 1rem; text-align: justify; }
+    table { width: 100%; border-collapse: collapse; margin: 2rem 0; font-size: 0.95rem; }
+    th, td { padding: 1rem; border: 1px solid var(--border); text-align: left; }
+    th { background: #fdfdfd; color: var(--primary); font-weight: 700; width: 35%; border-right: 2px solid var(--bg); }
+    .badge { padding: 5px 14px; border-radius: 4px; font-weight: 700; font-size: 0.8rem; color: white; display: inline-block; }
+    .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin: 2.5rem 0; }
+    .metric-card { background: var(--bg); padding: 2rem; border-radius: 4px; text-align: center; border: 1px solid var(--border); }
+    .metric-value { font-size: 2.2rem; font-weight: 900; margin: 0.5rem 0; }
+    .graph-container { display: flex; justify-content: center; gap: 2.5rem; flex-wrap: wrap; margin: 3rem 0; }
+    .chart-box { background: #fff; padding: 2rem; border: 1px solid var(--border); border-radius: 4px; flex: 1; min-width: 300px; text-align: center; }
+    pre { background: #0f172a; color: #e2e8f0; padding: 1.5rem; border-radius: 4px; overflow-x: auto; font-size: 0.85rem; }
+    ul { padding-left: 1.5rem; }
+    li { margin-bottom: 0.6rem; }
+    .method-list li { list-style: none; padding: 0.5rem; border-bottom: 1px solid var(--bg); }
+    .method-list li strong { color: var(--accent); }
+    @media print { .container { border: none; box-shadow: none; margin: 0; padding: 0; } h2 { page-break-before: always; } }
+</style>
+
+</head>
+<body>
+    <div class="container">
+        
+<header>
+    <div style="font-size: 0.75rem; letter-spacing: 2.5px; color: var(--text-muted); text-transform: uppercase;">Confidential Investigation · Evidence-Based Analysis</div>
+    <h1 style="margin-top: 0.5rem; text-transform: uppercase; letter-spacing: 1px;">Digital Forensic Investigation Report</h1>
+    <p style="color: var(--text-muted); margin-top: 0.2rem; font-style: italic;">Passive Metadata-Graph Protocol (PMGP) v2.0</p>
+</header>
+
+
+<section>
+    <h2>1. Case Information</h2>
+    <table>
+        <tr><th>Case Identifier</th><td>ACQ-FORENSIC-20260316-INTERNAL</td></tr>
+        <tr><th>Investigation Date</th><td>2026-03-16 14:42:33 UTC</td></tr>
+        <tr><th>Analyst / System</th><td>PMGP Engine (Standard Logic v2.0)</td></tr>
+        <tr><th>Evidence Source</th><td>Live Physical System</td></tr>
+        <tr><th>Analysis Scope</th><td>Full Heuristic Profiling: OS fingerprinting, offensive tool detection, and MITRE tactic cross-referencing.</td></tr>
+    </table>
+</section>
+
+
+<section>
+    <h2>2. Executive Summary</h2>
+    <div class="summary-grid">
+        <div class="metric-card">
+            <div style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase;">OS Identifier</div>
+            <div class="metric-value" style="font-size: 1.6rem;">Kali Linux</div>
+            <div style="font-size: 0.75rem;">Confidence Coefficient: 80%</div>
+        </div>
+        <div class="metric-card" style="border-top: 4px solid #d32f2f;">
+            <div style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase;">Heuristic Risk</div>
+            <div class="metric-value" style="color: #d32f2f;">CRITICAL</div>
+            <div style="font-size: 0.75rem;">Aggregated Score: 67/100</div>
+        </div>
+    </div>
+    <p>This report documents the forensic extraction of technical indicators from a <strong>Kali Linux</strong> environment. 
+    The investigation has assigned an overall risk level of <strong>CRITICAL</strong>. 
+    Detected artifacts suggest the presence of specialized toolsets typically associated with offensive security activities or anonymization infrastructure. 
+    While individual markers may have legitimate administrative purposes, their collective presence warrants detailed security review.</p>
+</section>
+
+
+<section>
+    <h2>3. Methodology</h2>
+    <p>The analysis follows standard forensic principles for evidence preservation. The <strong>PMGP v2.0 Engine</strong> utilizes a passive, metadata-driven approach:</p>
+    <ul class="method-list">
+        <li><strong>Non-Destructive Acquisition:</strong> No binaries are executed; evidence is treated as a read-only data source.</li>
+        <li><strong>Package Metadata Forensics:</strong> Analyzing system package databases (dpkg/pacman) to verify software provenance.</li>
+        <li><strong>Volatile Registry Inspection:</strong> Scanning <code>/proc</code> pseudofilesystems for live process markers on active systems.</li>
+        <li><strong>Heuristic Pattern Matching:</strong> Utilizing a graph-based protocol to correlate disparate artifacts into high-level kill chain indicators.</li>
+        <li><strong>MITRE Alignment:</strong> Mapping findings to the 2024 ATT&CK matrix to provide strategic context for incident response.</li>
+    </ul>
+</section>
+
+
+<section>
+    <h2>4. System Identification</h2>
+    <p>The OS profile was determined via high-confidence heuristic distribution fingerprinting.</p>
+    <table>
+        <tr><th>Detected Distribution</th><td><strong>Kali Linux</strong></td></tr>
+        <tr><th>Profile Confidence</th><td>80%</td></tr>
+        <tr><th>Package Architecture</th><td>dpkg</td></tr>
+    </table>
+    <h3>Identification Signatures</h3>
+    <ul class="summary-list"><li>Kali metapackages found: kali-linux-core</li><li>Kali repository URL found in apt sources</li></ul>
+</section>
+
+
+<section>
+    <h2>5. Evidence Sources Examined</h2>
+    <p>The analyst successfully extracted and verified data from the following authoritative sources:</p>
+    <ul><li>Primary System Status DB (<code>\\wsl$\kali-linux/var/lib/dpkg/status</code>)</li><li>Filesystem Root Heuristic Sweeps</li><li>System and Shell Configuration Templates (<code>/etc/skel</code>, <code>/etc/environment</code>)</li><li>Volatile Process Environment Variables (<code>/proc/[PID]/environ</code>)</li><li>Active Raw Network Sockets (<code>/proc/net</code>)</li></ul>
+</section>
+
+
+<section>
+    <h2>6. Tool and Capability Assessment</h2>
+    <p>Detailed enumeration of detected utilities and their forensic classifications:</p>
+    <table>
+        <tr><th>Identifier</th><th>Functionality Note</th><th>MITRE Mapping</th><th>Category</th><th>Classification</th></tr>
+        
+        <tr>
+            <td><strong>wireshark</strong></td>
+            <td>Network protocol analyzer</td>
+            <td style="font-size: 0.85rem;"><code>T1040 - Network Sniffing</code></td>
+            <td>Collection</td>
+            <td><span class="badge" style="background:#475569; color:white;">Dual_Use</span></td>
+        </tr>
+        <tr>
+            <td><strong>tcpdump</strong></td>
+            <td>Packet analyzer</td>
+            <td style="font-size: 0.85rem;"><code>T1040 - Network Sniffing</code></td>
+            <td>Collection</td>
+            <td><span class="badge" style="background:#475569; color:white;">Dual_Use</span></td>
+        </tr>
+        <tr>
+            <td><strong>netcat</strong></td>
+            <td>TCP/UDP networking utility</td>
+            <td style="font-size: 0.85rem;"><code>T1059 - Command and Scripting Interpreter</code></td>
+            <td>Execution</td>
+            <td><span class="badge" style="background:#475569; color:white;">Dual_Use</span></td>
+        </tr>
+        <tr>
+            <td><strong>tor</strong></td>
+            <td>Onion routing anonymizer</td>
+            <td style="font-size: 0.85rem;"><code>T1090.003 - Multi-hop Proxy</code></td>
+            <td>Command and Control</td>
+            <td><span class="badge" style="background:#475569; color:white;">Anonymization</span></td>
+        </tr>
+        <tr>
+            <td><strong>torsocks</strong></td>
+            <td>Route application traffic through Tor</td>
+            <td style="font-size: 0.85rem;"><code>T1090.003 - Multi-hop Proxy</code></td>
+            <td>Command and Control</td>
+            <td><span class="badge" style="background:#475569; color:white;">Anonymization</span></td>
+        </tr>
+    </table>
+</section>
+
+
+<section>
+    <h2>7. Timeline of Notable Events</h2>
+    <p>A chronological audit trail reconstructed from filesystem metadata follows. Note: Timestamps represent the earliest and latest indicators of presence and access.</p>
+    <table>
+        <tr><th>Timestamp (UTC)</th><th>Artifact Activity / Indicator</th></tr>
+        <tr><td style='white-space:nowrap;'>2025-09-15 14:10:23 UTC</td><td>Software Installation/Metadata Entry: <code>netcat</code></td></tr><tr><td style='white-space:nowrap;'>2025-09-15 14:10:28 UTC</td><td>Software Installation/Metadata Entry: <code>tcpdump</code></td></tr><tr><td style='white-space:nowrap;'>2025-12-18 09:35:10 UTC</td><td>Forensic Access Trace (Execution Indicative): <code>tcpdump</code></td></tr><tr><td style='white-space:nowrap;'>2025-12-18 09:38:53 UTC</td><td>Forensic Access Trace (Execution Indicative): <code>wireshark</code></td></tr><tr><td style='white-space:nowrap;'>2025-12-18 09:38:56 UTC</td><td>Software Installation/Metadata Entry: <code>wireshark</code></td></tr><tr><td style='white-space:nowrap;'>2025-12-18 09:49:32 UTC</td><td>Software Installation/Metadata Entry: <code>tor</code></td></tr><tr><td style='white-space:nowrap;'>2025-12-18 09:49:32 UTC</td><td>Software Installation/Metadata Entry: <code>torsocks</code></td></tr><tr><td style='white-space:nowrap;'>2025-12-18 09:50:36 UTC</td><td>Forensic Access Trace (Execution Indicative): <code>torsocks</code></td></tr><tr><td style='white-space:nowrap;'>2026-03-16 05:45:29 UTC</td><td>Forensic Access Trace (Execution Indicative): <code>tor</code></td></tr>
+    </table>
+</section>
+
+<section><h2>8. Disk and Encryption Analysis</h2><p>Evidence was provided as a filesystem mount; hardware block analysis was suppressed.</p></section>
+
+<section>
+    <h2>9. Volatile System Analysis</h2>
+    <p>Active process environment analysis identified the following anomalies:</p>
+    <table>
+        <tr><th>PID</th><th>Command Name</th><th>Flagged Variables</th><th>Observation</th></tr>
+        <tr><td>252</td><td><code>tor</code></td><td>-</td><td>[T1090.003] Tor anonymizer running — cmdline: /usr/bin/tor --defaults-torrc /usr/share/tor/tor-service-defaults-torrc -f /etc/tor/torrc --RunAsDaemon 0</td></tr>
+    </table>
+</section>
+
+
+<section>
+    <h2>10. MITRE ATT&CK Mapping</h2>
+    <p>The identified artifacts align with the following adversary Tactics, Techniques, and Procedures (TTPs):</p>
+    <table>
+        <tr><th>Technique</th><th>Description</th><th>Strategic Tactic</th><th>Evidence Correlation</th></tr>
+        <tr><td><code>T1059</code></td><td>Command and Scripting Interpreter</td><td>Execution</td><td>netcat</td></tr><tr><td><code>T1040</code></td><td>Network Sniffing</td><td>Collection</td><td>wireshark, tcpdump</td></tr><tr><td><code>T1090.003</code></td><td>Multi-hop Proxy</td><td>Command and Control</td><td>tor, torsocks, tor</td></tr>
+    </table>
+</section>
+
+
+<section>
+    <h2>11. Risk Assessment</h2>
+    <div class="graph-container">
+        <div class="chart-box">
+            <h4 style="margin:0 0 1rem 0;">Heuristic Risk Score</h4>
+            
+<svg width="150" height="150" viewBox="0 0 100 100">
+  <circle cx="50" cy="50" r="40" fill="none" stroke="#f1f5f9" stroke-width="10"/>
+  <circle cx="50" cy="50" r="40" fill="none" stroke="#d32f2f" stroke-width="10"
+          stroke-dasharray="251" stroke-dashoffset="82.83000000000001" transform="rotate(-90 50 50)"/>
+  <text x="50" y="55" font-family="sans-serif" font-size="20" font-weight="900" text-anchor="middle" fill="#d32f2f">67</text>
+  <text x="50" y="70" font-family="sans-serif" font-size="6" font-weight="700" text-anchor="middle" fill="#94a3b8">LEVEL: CRITICAL</text>
+</svg>
+
+        </div>
+        <div class="chart-box">
+            <h4 style="margin:0 0 1rem 0;">MITRE Tactic Frequency</h4>
+            <svg width="280" height="115" viewBox="0 0 280 115">
+        <rect x="90" y="25" width="120.0" height="12" fill="#3b82f6" rx="1" />
+        <text x="85" y="34" font-family="sans-serif" font-size="7" font-weight="600" text-anchor="end" fill="#475569">Execution</text>
+        <text x="216.0" y="34" font-family="sans-serif" font-size="7" fill="#94a3b8">1</text>
+        
+        <rect x="90" y="50" width="120.0" height="12" fill="#3b82f6" rx="1" />
+        <text x="85" y="59" font-family="sans-serif" font-size="7" font-weight="600" text-anchor="end" fill="#475569">Collection</text>
+        <text x="216.0" y="59" font-family="sans-serif" font-size="7" fill="#94a3b8">1</text>
+        
+        <rect x="90" y="75" width="120.0" height="12" fill="#3b82f6" rx="1" />
+        <text x="85" y="84" font-family="sans-serif" font-size="7" font-weight="600" text-anchor="end" fill="#475569">Command and Control</text>
+        <text x="216.0" y="84" font-family="sans-serif" font-size="7" fill="#94a3b8">1</text>
+        </svg>
+        </div>
+    </div>
+    <p>The Risk Assessment is an algorithmic weighting of detected offensive capabilities (Score: <strong>67/100</strong>). 
+    The current environment is categorized as <strong>CRITICAL RISK</strong>.</p>
+    <h3>Inferred Capabilities</h3>
+    <p>Based strictly on evidence: the asset contains artifacts capable of <strong>Standard System Operations</strong>.</p>
+</section>
+
+
+<section>
+    <h2>12. Limitations</h2>
+    <p>The scope and reach of this investigation are subject to the following professional limitations:</p>
+    <ul class="summary-list"><li>Metatada-only analysis: Hidden encrypted containers or memory-only rootkits may not be identified.</li><li>Clock Integrity: Timestamps rely on the system clock validity at the time of artifact creation.</li><li>Obfuscation: Sophisticated anti-forensic 'wiper' or 'timestomp' tools can modify the indicators utilized in this report.</li></ul>
+</section>
+
+
+<section>
+    <h2>13. Conclusion</h2>
+    <p>The automated forensic examination identifies a <strong>significant concentration</strong> of security-focused artifacts. 
+    The findings are consistent with environments designed for offensive security testing or sensitive communications. 
+    While no specific malicious exploit was identified in flight, the presence of detection-evasion and exploitation toolsets represents a high investigative priority. 
+    Corroboration with full memory scans and netflow logs is recommended.</p>
+</section>
+
+<section>
+    <h2>14. Appendix – Evidence Artifacts</h2>
+    <h3>Detected Offensive Package List</h3>
+    <pre>[
+  "wireshark",
+  "tcpdump",
+  "netcat",
+  "tor",
+  "torsocks"
+]</pre>
+    <h3>Strategic Technique Registry</h3>
+    <pre>[
+  "T1059",
+  "T1040",
+  "T1090.003"
+]</pre>
+</section>
+
+    </div>
+    <div style="text-align:center; padding:1.5rem; color:#94a3b8; font-size:0.8rem; font-family:sans-serif;">
+        PMGP Digital Forensic Report · Proprietary Intelligence · 2026-03-16 14:42:33 UTC
+    </div>
+</body>
+</html>

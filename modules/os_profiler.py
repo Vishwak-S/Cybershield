@@ -19,6 +19,7 @@ class OSType(str, Enum):
     TAILS_OS       = "Tails OS"
     DEBIAN         = "Debian/Ubuntu"
     ARCH_LINUX     = "Arch Linux"
+    WINDOWS        = "Windows"
     UNKNOWN        = "Unknown Linux"
 
 
@@ -145,6 +146,17 @@ def identify_os(root_path: str, tails_disk_confirmed: bool = False) -> OSProfile
                 pkg_db_path=pacman_dir,
                 pkg_db_type="pacman",
             )
+        _scan_filesystem_artefacts(root_path, profile)
+        return profile
+        
+    # Check for Windows
+    import sys
+    if os.path.exists(os.path.join(root_path, "Windows", "System32")) or (sys.platform == "win32" and root_path in ("/", "\\")):
+        profile = OSProfile(
+            os_type=OSType.WINDOWS,
+            confidence=0.9,
+            indicators=["Windows System32 directory found or Windows host detected"],
+        )
         _scan_filesystem_artefacts(root_path, profile)
         return profile
 

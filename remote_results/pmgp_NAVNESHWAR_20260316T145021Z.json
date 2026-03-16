@@ -1,0 +1,42 @@
+{
+  "report_meta": {
+    "tool": "Passive Metadata-Graph Protocol (PMGP)",
+    "version": "2.0",
+    "generated_at": "2026-03-16 14:50:26 UTC"
+  },
+  "os_profile": {
+    "os_type": "Debian/Ubuntu",
+    "confidence": 0.75,
+    "pkg_db_type": "dpkg"
+  },
+  "risk_assessment": {
+    "overall_risk": "HIGH",
+    "risk_score": 51
+  },
+  "detected_tools": [
+    {
+      "name": "tcpdump",
+      "risk": "dual_use",
+      "mtime": 0.0,
+      "atime": null
+    },
+    {
+      "name": "netcat",
+      "risk": "dual_use",
+      "mtime": 0.0,
+      "atime": null
+    },
+    {
+      "name": "tor",
+      "risk": "anonymization",
+      "mtime": 0.0,
+      "atime": null
+    },
+    {
+      "name": "torsocks",
+      "risk": "anonymization",
+      "mtime": 0.0,
+      "atime": null
+    }
+  ]
+}

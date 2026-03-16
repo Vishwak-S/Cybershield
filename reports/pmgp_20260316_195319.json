@@ -1,0 +1,156 @@
+{
+  "report_meta": {
+    "tool": "Passive Metadata-Graph Protocol (PMGP)",
+    "version": "2.0",
+    "generated_at": "2026-03-16 14:23:19 UTC"
+  },
+  "os_profile": {
+    "os_type": "Kali Linux",
+    "confidence": 0.8,
+    "indicators": [
+      "Kali metapackages found: kali-linux-core",
+      "Kali repository URL found in apt sources"
+    ],
+    "pkg_db_type": "dpkg",
+    "pkg_db_path": "\\\\wsl$\\kali-linux/var/lib/dpkg/status",
+    "tails_disk_confirmed": false,
+    "filesystem_artefacts": [
+      {
+        "path": "etc/cron.d",
+        "type": "cron",
+        "description": "Cron directory with 1 job(s): e2scrub_all",
+        "risk_level": "LOW",
+        "snippet": ""
+      },
+      {
+        "path": "etc/cron.daily",
+        "type": "cron",
+        "description": "Cron directory with 5 job(s): dpkg, apt-compat, plocate, logrotate, man-db",
+        "risk_level": "LOW",
+        "snippet": ""
+      },
+      {
+        "path": "etc/crontab",
+        "type": "cron",
+        "description": "Cron job file with 6 active entry(s) – potential persistence",
+        "risk_level": "MEDIUM",
+        "snippet": "SHELL=/bin/sh"
+      },
+      {
+        "path": "etc/hosts",
+        "type": "hosts_mod",
+        "description": "/etc/hosts has 4 custom entry(s) – possible C2 infrastructure mapping or domain hijacking",
+        "risk_level": "MEDIUM",
+        "snippet": "fe00::0 ip6-localnet"
+      }
+    ]
+  },
+  "risk_assessment": {
+    "overall_risk": "MEDIUM",
+    "risk_score": 32,
+    "summary": [
+      "Overall Risk: MEDIUM (score 32/100)",
+      "OS: Kali Linux (confidence 80%)",
+      "Packages scanned: 0",
+      "Suspicious tools detected: 0 (0 high-risk, 0 dual-use, 0 anonymization)",
+      "Filesystem artefacts: 4 (shell history, SSH keys, cron jobs, hosts modifications)",
+      "Live processes scanned: 22 (1 with suspicious indicators)"
+    ],
+    "kill_chains": [],
+    "time_of_attack": "2026-03-16 13:13:15 UTC (Extracted)"
+  },
+  "detected_tools": [],
+  "mitre_coverage": [
+    {
+      "technique_id": "T1090.003",
+      "technique_name": "Tor anonymizer running",
+      "tactic": "Command and Control",
+      "tools": [
+        "tor"
+      ]
+    }
+  ],
+  "risk_items": [
+    {
+      "source": "os",
+      "risk_level": "HIGH",
+      "title": "OS Identified: Kali Linux",
+      "description": "Kali Linux – offensive security distribution detected (confidence: 80%)",
+      "mitre_technique": "",
+      "mitre_category": "",
+      "evidence": "Kali metapackages found: kali-linux-core; Kali repository URL found in apt sources"
+    },
+    {
+      "source": "artefact",
+      "risk_level": "LOW",
+      "title": "Filesystem artefact: etc/cron.d",
+      "description": "Cron directory with 1 job(s): e2scrub_all",
+      "mitre_technique": "T1053.003",
+      "mitre_category": "Persistence",
+      "evidence": "Path: etc/cron.d"
+    },
+    {
+      "source": "artefact",
+      "risk_level": "LOW",
+      "title": "Filesystem artefact: etc/cron.daily",
+      "description": "Cron directory with 5 job(s): dpkg, apt-compat, plocate, logrotate, man-db",
+      "mitre_technique": "T1053.003",
+      "mitre_category": "Persistence",
+      "evidence": "Path: etc/cron.daily"
+    },
+    {
+      "source": "artefact",
+      "risk_level": "MEDIUM",
+      "title": "Filesystem artefact: etc/crontab",
+      "description": "Cron job file with 6 active entry(s) – potential persistence",
+      "mitre_technique": "T1053.003",
+      "mitre_category": "Persistence",
+      "evidence": "Path: etc/crontab | Snippet: SHELL=/bin/sh"
+    },
+    {
+      "source": "artefact",
+      "risk_level": "MEDIUM",
+      "title": "Filesystem artefact: etc/hosts",
+      "description": "/etc/hosts has 4 custom entry(s) – possible C2 infrastructure mapping or domain hijacking",
+      "mitre_technique": "T1583.001",
+      "mitre_category": "Resource Development",
+      "evidence": "Path: etc/hosts | Snippet: fe00::0 ip6-localnet"
+    },
+    {
+      "source": "process",
+      "risk_level": "HIGH",
+      "title": "Offensive tool running: PID 252 (tor)",
+      "description": "Tor anonymizer running — /usr/bin/tor --defaults-torrc /usr/share/tor/tor-service-defaults-torrc -f /etc/tor/torrc --RunAsDae",
+      "mitre_technique": "T1090.003",
+      "mitre_category": "Command and Control",
+      "evidence": "/proc/252/cmdline"
+    }
+  ],
+  "live_analysis": {
+    "is_live_system": true,
+    "total_processes_scanned": 22,
+    "suspicious_connections": 0,
+    "findings": [
+      {
+        "pid": 252,
+        "comm": "tor",
+        "cmdline": "/usr/bin/tor --defaults-torrc /usr/share/tor/tor-service-defaults-torrc -f /etc/tor/torrc --RunAsDaemon 0",
+        "suspicious_vars": {},
+        "attacker_ips": {},
+        "suspicious_paths": [],
+        "suspicious_maps": [],
+        "cmdline_matches": [
+          {
+            "note": "Tor anonymizer running",
+            "technique": "T1090.003",
+            "category": "Command and Control"
+          }
+        ],
+        "notes": [
+          "[T1090.003] Tor anonymizer running — cmdline: /usr/bin/tor --defaults-torrc /usr/share/tor/tor-service-defaults-torrc -f /etc/tor/torrc --RunAsDaemon 0"
+        ]
+      }
+    ],
+    "network_connections": []
+  }
+}

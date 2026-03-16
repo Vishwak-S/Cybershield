@@ -11,7 +11,11 @@ from dataclasses import dataclass, field
 from typing import Optional, Callable
 
 from modules.os_profiler import identify_os, OSProfile
-from modules.tool_detector import detect_tools, ToolDetectionResult
+from modules.tool_detector import (
+    correlate_tool_evidence,
+    detect_tools,
+    ToolDetectionResult,
+)
 from modules.live_analyzer import analyze_live_system, LiveAnalysisResult
 from modules.disk_analyzer import analyze_disk, DiskAnalysisResult
 from modules.risk_classifier import classify_risk, RiskReport
@@ -113,6 +117,17 @@ def run_pipeline(
         except Exception as exc:
             result.errors.append(f"Live analyzer error: {exc}")
             result.live_result = None
+
+    if result.os_profile and result.tool_result:
+        try:
+            result.tool_result = correlate_tool_evidence(
+                result.os_profile,
+                result.tool_result,
+                result.live_result,
+                observed_at=time.time(),
+            )
+        except Exception as exc:
+            result.errors.append(f"Tool evidence correlation error: {exc}")
 
     # ── Stage 5: Risk classification ──────────────────────────────────────
     _progress("Classifying risk, inferring kill chains, mapping MITRE ATT&CK…", 82)

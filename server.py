@@ -24,7 +24,7 @@ from flask import Flask, request, jsonify
 sys.path.insert(0, os.path.dirname(__file__))
 
 from modules.os_profiler import identify_os
-from modules.tool_detector import detect_tools
+from modules.tool_detector import correlate_tool_evidence, detect_tools
 from modules.live_analyzer import analyze_live_system
 from modules.risk_classifier import classify_risk
 from modules.report_generator import generate_json_report, generate_html_report
@@ -126,8 +126,14 @@ def _process_bundle(bundle_path: str, hostname: str, timestamp: str) -> None:
             )
 
             print("[*] Running live analyzer…")
-            proc_path = os.path.join(vfs, "proc", "pids_flat")
             live_result = _analyze_remote_proc(fs_root, vfs)
+
+            tool_result = correlate_tool_evidence(
+                os_profile,
+                tool_result,
+                live_result,
+                observed_at=_parse_bundle_timestamp(timestamp),
+            )
 
             print("[*] Running risk classifier…")
             risk_report = classify_risk(
@@ -223,6 +229,9 @@ def _build_vfs(fs_root: str, base: str) -> str:
         ("conf/_etc_proxychains4.conf",    "etc/proxychains4.conf"),
         ("conf/_etc_hosts",                "etc/hosts"),
         ("conf/_etc_crontab",              "etc/crontab"),
+        ("logs/dpkg.log",                  "var/log/dpkg.log"),
+        ("logs/dpkg.log.1",                "var/log/dpkg.log.1"),
+        ("logs/pacman.log",                "var/log/pacman.log"),
     ]
 
     for src_rel, dst_rel in mappings:
@@ -255,6 +264,12 @@ def _build_vfs(fs_root: str, base: str) -> str:
     dst_dir = os.path.join(vfs, "var/lib/pacman/local")
     if os.path.isdir(src_dir):
         shutil.copytree(src_dir, dst_dir, dirs_exist_ok=True)
+
+    # Collector-provided path access/install metadata
+    stats_src = os.path.join(fs_root, "fs/bin-stats.tsv")
+    stats_dst = os.path.join(vfs, ".pmgp_path_stats.tsv")
+    if os.path.isfile(stats_src):
+        shutil.copy2(stats_src, stats_dst)
 
     # Shell histories → root home
     activity_dir = os.path.join(fs_root, "activity")
@@ -369,6 +384,15 @@ def _analyze_remote_proc(fs_root: str, vfs: str):
     if os.path.isdir(proc_path):
         return analyze_live_system(proc_path)
     return None
+
+
+def _parse_bundle_timestamp(timestamp: str) -> float:
+    try:
+        return datetime.strptime(timestamp, "%Y%m%dT%H%M%SZ").replace(
+            tzinfo=timezone.utc
+        ).timestamp()
+    except ValueError:
+        return datetime.now(timezone.utc).timestamp()
 
 
 # ── Entry point ───────────────────────────────────────────────────────────────

